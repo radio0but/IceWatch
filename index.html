@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Radio Étudiante</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 50px;
+      background-color: #f0f2f5;
+    }
+
+    .post {
+      max-width: 720px;
+      margin: 20px auto;
+      padding: 25px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #ffffff;
+      box-shadow: 2px 2px 12px rgba(0,0,0,0.08);
+    }
+
+    h2 { margin-top: 0; }
+    audio, iframe { width: 100%; border: none; }
+    #metadata { margin-top: 10px; font-style: italic; color: #444; }
+  </style>
+</head>
+<body>
+
+  <!-- Bloc Audio -->
+  <div class="post">
+    <h2>🎙 Radio Étudiante – Audio</h2>
+    <p>En direct depuis nos studios</p>
+    <div id="player-container">Chargement du lecteur audio…</div>
+    <div id="metadata">Chargement des infos en cours…</div>
+  </div>
+
+  <!-- Bloc Vidéo -->
+  <div class="post">
+    <h2>📺 Radio Étudiante – Vidéo en direct</h2>
+    <p>Streaming vidéo haute qualité</p>
+    <div id="video-container">Chargement du lecteur vidéo…</div>
+  </div>
+
+  <script>
+    const API_BASE = "https://radio.boogiepit.com";
+
+    async function fetchToken() {
+      const res = await fetch(`${API_BASE}/auth/token`, {
+        headers: { "Referer": "https://test.boogiepit.com/" }
+      });
+      const { token } = await res.json();
+      return token;
+    }
+
+    async function setupAudio(token) {
+      const audio = document.createElement("audio");
+      audio.src = `${API_BASE}/radio?token=${encodeURIComponent(token)}`;
+      audio.controls = true;
+      audio.autoplay = true;
+
+      const container = document.getElementById("player-container");
+      container.innerHTML = "";
+      container.appendChild(audio);
+    }
+
+    async function updateMetadata() {
+      try {
+        const res = await fetch(`${API_BASE}/radio/metadata`);
+        const { title } = await res.json();
+        document.getElementById("metadata").innerText =
+          title ? `📻 En cours : ${title}` : "Aucune métadonnée disponible.";
+      } catch {
+        document.getElementById("metadata").innerText =
+          "Erreur lors du chargement des métadonnées.";
+      }
+    }
+
+    async function setupVideo(token) {
+      const iframe = document.createElement("iframe");
+      iframe.src = `${API_BASE}/owncast/embed/video/?token=${encodeURIComponent(token)}`;
+      iframe.allowFullscreen = true;
+      iframe.width = "720";
+      iframe.height = "405";
+      iframe.frameBorder = "0";
+
+      const container = document.getElementById("video-container");
+      container.innerHTML = "";
+      container.appendChild(iframe);
+    }
+
+    async function initPlayers() {
+      try {
+        const token = await fetchToken();
+        if (!token) throw new Error("Pas de token");
+
+        await setupAudio(token);
+        updateMetadata();
+        setInterval(updateMetadata, 15000);
+
+        await setupVideo(token); // affiché immédiatement
+      } catch (err) {
+        console.error(err);
+        document.getElementById("player-container").innerText =
+          "Erreur de chargement du lecteur audio.";
+        document.getElementById("video-container").innerText =
+          "Erreur de chargement du lecteur vidéo.";
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", initPlayers);
+  </script>
+
+</body>
+</html>
