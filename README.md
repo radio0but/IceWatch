@@ -212,8 +212,9 @@ sudo nano /etc/icewatch/application.properties
 ## ⚙️ 2. application.properties Example
 
 ```properties
+server.port=9090
 icewatch.master-token=MASTER_SECRET_TOKEN
-icewatch.allowed-domain=https://your-frontend.example.com
+icewatch.allowed-domain=https://your-frontend-domain.com
 icewatch.owncast-url=http://localhost:8123
 icewatch.icecast-stream-url=http://localhost:8000/radio
 ```
