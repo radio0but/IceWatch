@@ -1,5 +1,7 @@
 # IceWatch
 
+![IceWatch Logo](logo.png)
+
 **IceWatch** is a secure Spring Boot backend designed to proxy and protect audio/video streams served by **Icecast** and **Owncast**. It enables dynamic token-based access control, referer validation, and seamless frontend integration.
 
 ---
