@@ -181,6 +181,96 @@ async function initPlayers() {
 window.addEventListener('DOMContentLoaded', initPlayers);
 ```
 
+# Deploying IceWatch as a systemd Service
+
+This guide explains how to deploy IceWatch as a Linux service using `systemd`.  
+It assumes you have the JAR built (`icewatch.jar`) and a configuration file (`application.properties`).
+
+---
+
+## 📁 1. Move files to appropriate locations
+
+```bash
+sudo mkdir -p /opt/icewatch
+sudo mkdir -p /etc/icewatch
+
+# Copy the JAR
+sudo cp backend-0.0.1-SNAPSHOT.jar /opt/icewatch/icewatch.jar
+
+# Create and edit the config file
+sudo nano /etc/icewatch/application.properties
+```
+
+---
+
+## ⚙️ 2. application.properties Example
+
+```properties
+icewatch.master-token=MASTER_SECRET_TOKEN
+icewatch.allowed-domain=https://your-frontend.example.com
+icewatch.owncast-url=http://localhost:8123
+icewatch.icecast-stream-url=http://localhost:8000/radio
+```
+
+---
+
+## 🛠️ 3. Create a systemd service
+
+```bash
+sudo nano /etc/systemd/system/icewatch.service
+```
+
+Paste the following content:
+
+```ini
+[Unit]
+Description=IceWatch Radio Proxy
+After=network.target
+
+[Service]
+Type=simple
+User=icewatch
+Group=icewatch
+WorkingDirectory=/opt/icewatch
+ExecStart=/usr/bin/java -jar /opt/icewatch/icewatch.jar --spring.config.location=file:/etc/icewatch/application.properties
+Restart=always
+RestartSec=5
+Environment=JAVA_OPTS=-Xmx256m
+
+[Install]
+WantedBy=multi-user.target
+```
+
+> ℹ️ Replace `icewatch` user/group if you prefer another system user.
+
+---
+
+## ▶️ 4. Enable and start the service
+
+```bash
+# Optionally create a dedicated user
+sudo useradd -r -s /bin/false icewatch
+
+# Adjust permissions
+sudo chown -R icewatch:icewatch /opt/icewatch
+sudo chown -R icewatch:icewatch /etc/icewatch
+
+# Enable and start the service
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+sudo systemctl enable icewatch
+sudo systemctl start icewatch
+```
+
+---
+
+## ✅ 5. Check the service
+
+```bash
+sudo systemctl status icewatch
+journalctl -u icewatch -f
+```
+
 ---
 
 > **Note:**  
