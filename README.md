@@ -40,7 +40,7 @@ icewatch.icecast-stream-url=http://localhost:8000/radio
 bash
 Copier
 # Build and run
-mvn clean install
+./mvnw clean package
 java -jar target/backend-0.0.1-SNAPSHOT.jar
 📄 License
 MIT — free to use, modify, and contribute.
