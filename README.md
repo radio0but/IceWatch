@@ -180,7 +180,13 @@ async function initPlayers() {
 
 window.addEventListener('DOMContentLoaded', initPlayers);
 ```
+---
 
+> **Note:**  
+> - **`Origin` header** (or `Referer`) must match the domain you’ve whitelisted in your IceWatch backend (`allowed-domain`).  
+> - Adjust `API_BASE` to point at your deployed IceWatch service.  
+
+These snippets can be dropped directly into your front-end codebase to quickly integrate secured audio/video streaming.
 # Deploying IceWatch as a systemd Service
 
 This guide explains how to deploy IceWatch as a Linux service using `systemd`.  
@@ -271,13 +277,7 @@ sudo systemctl status icewatch
 journalctl -u icewatch -f
 ```
 
----
 
-> **Note:**  
-> - **`Origin` header** (or `Referer`) must match the domain you’ve whitelisted in your IceWatch backend (`allowed-domain`).  
-> - Adjust `API_BASE` to point at your deployed IceWatch service.  
-
-These snippets can be dropped directly into your front-end codebase to quickly integrate secured audio/video streaming.
 
 
 ❤️ Author
