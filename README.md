@@ -299,20 +299,19 @@ Ce script installe et configure automatiquement tout le stack **IceWatch**, incl
 
 ## 🚀 Installation
 
-1. Placez le script `install.sh` sur votre machine.
-2. Rendez-le exécutable :
+1. Placez le script `install.sh` sur votre machine et Rendez-le exécutable :
 
    ```bash
-   chmod +x install.sh
+   curl -L https://github.com/radio0but/IceWatch/releases/download/v0.0.1/installer.sh -o install.sh && chmod +x install.sh
    ```
 
-3. Exécutez le script :
+2. Exécutez le script :
 
    ```bash
    ./install.sh
    ```
 
-4. Répondez aux questions interactives :
+3. Répondez aux questions interactives :
 
    - **Nom d'utilisateur admin Icecast** : (ex. `admin`)
    - **Mot de passe admin Icecast**
