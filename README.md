@@ -279,6 +279,98 @@ journalctl -u icewatch -f
 ```
 
 
+# 📦 Guide d'installation de IceWatch Stack
+
+Ce script installe et configure automatiquement tout le stack **IceWatch**, incluant :
+
+- **Icecast2** (serveur de streaming audio)
+- **Liquidsoap** (outil de diffusion automatisée)
+- **Owncast** (plateforme de diffusion vidéo en direct)
+- **IceWatch** (application proxy et système de jetons dynamiques, développée pour ce projet)
+
+---
+
+## ✅ Prérequis
+
+- Un conteneur ou serveur **Debian** (LXC compatible recommandé)
+- Droits superutilisateur (root)
+
+---
+
+## 🚀 Installation
+
+1. Placez le script `install.sh` sur votre machine.
+2. Rendez-le exécutable :
+
+   ```bash
+   chmod +x install.sh
+   ```
+
+3. Exécutez le script :
+
+   ```bash
+   ./install.sh
+   ```
+
+4. Répondez aux questions interactives :
+
+   - **Nom d'utilisateur admin Icecast** : (ex. `admin`)
+   - **Mot de passe admin Icecast**
+   - **Référent frontend autorisé** (ex. `https://radio.monsite.com`)
+   - **Mot de passe admin Owncast**
+   - **Port IceWatch (optionnel, défaut : 9090)**
+
+---
+
+## ⚠️ Message pendant l'installation Icecast
+
+**Important :**
+Lors de l'installation de `icecast2`, Debian affiche une interface vous demandant :
+
+```
+Configurer Icecast2 avec debconf ?
+```
+
+🛑 **Répondez "Non"**. Le script configure **automatiquement** Icecast, donc cette étape est inutile. Cocher "Oui" risque de produire une configuration erronée.
+
+---
+
+## 🔓 Accès aux services
+
+Une fois l’installation complétée, les adresses suivantes sont disponibles (selon votre IP locale) :
+
+| Service             | URL d'accès                              | Identifiants                              |
+|---------------------|-------------------------------------------|--------------------------------------------|
+| Icecast Admin       | `http://<ip_local>:8000/admin/`           | Utilisateur : fourni au script<br>Mot de passe : fourni au script |
+| Owncast Admin       | `http://<ip_local>:8123/admin/`           | Utilisateur : `admin`<br>Mot de passe : `abc123` *(par défaut)* |
+| Streaming RTMP      | `rtmp://<ip_local>:1935/live`             | Clé : `abc123` *(par défaut)*              |
+| IceWatch API Token  | `http://<ip_local>:9090/auth/token`       | Domaine autorisé : selon votre saisie<br>Master Token : généré automatiquement |
+
+---
+
+## 🧹 Désinstallation
+
+Pour désinstaller proprement tous les services :
+
+```bash
+./install.sh --uninstall
+```
+
+Cela arrête et supprime :
+- IceWatch
+- Owncast
+- Icecast2
+- Tous les fichiers de config et répertoires associés
+
+---
+
+## 🛠 Notes techniques
+
+- Icecast écoute sur les ports `8000` (clients) et `8001` (sources)
+- Le fichier `application.properties` d'IceWatch est généré dynamiquement
+- Le Master Token est aléatoire et unique à chaque déploiement
+
+---
 
 
 ❤️ Author
