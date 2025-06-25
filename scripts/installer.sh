@@ -229,8 +229,8 @@ DAYS=(dimanche lundi mardi mercredi jeudi vendredi samedi)
 
 echo "[INFO] Téléchargement du template Liquidsoap…"
 curl -sL "$TEMPLATE_URL" \
-  | sed -e "s|__ICECAST_HOST__|${ICECAST_HOST}|g" \
-        -e "s|__SOURCE_PASSWORD__|${SOURCE_PASSWORD}|g" \
+  | sed -e "s|__ICECAST_HOST__|${IP_ADDR}|g" \
+        -e "s|__SOURCE_PASSWORD__|${ICECAST_PASSWORD}|g" \
   > "$TEMPLATE"
 chown nobody:nogroup "$TEMPLATE"
 chmod 664           "$TEMPLATE"
