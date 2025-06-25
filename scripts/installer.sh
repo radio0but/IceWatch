@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# ––– désactive toute interaction debconf / APT
+export DEBIAN_FRONTEND=noninteractive
+export DEBIAN_PRIORITY=critical
+export APT_LISTCHANGES_FRONTEND=none
+
+# ––– force needrestart à redémarrer sans poser de question
+export NEEDRESTART_MODE=a
+
+# ––– si vous utilisez ucf pour les fichiers de config
+export UCF_FORCE_CONFFNEW=1
+
 # Handle uninstall
 if [[ "$1" == "--uninstall" ]]; then
     echo "🧹 Uninstalling IceWatch Stack..."
@@ -145,8 +156,10 @@ systemctl start icewatch
 # ────────────────
 echo "🔧 Installation et configuration du partage Samba (/srv/radioemissions)..."
 
-# 1. Installer Samba
-apt install -y samba
+sudo apt-get install -y \
+  -o Dpkg::Options::="--force-confdef" \
+  -o Dpkg::Options::="--force-confold" \
+  samba
 
 # 2. Créer le dossier de partage si nécessaire
 mkdir -p /srv/radioemissions
