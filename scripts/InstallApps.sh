@@ -81,33 +81,49 @@ fi
 info "Configuration du montage du partage radioemissions…"
 
 # Installer cifs-utils si nécessaire
-if ! command -v mount.cifs &> /dev/null; then
-  info "Installation de cifs-utils..."
-  sudo pacman -S --noconfirm cifs-utils
+
+sudo pacman -S --noconfirm cifs-utils
+
+# si le module cifs n'est pas déjà chargé, on le charge
+if ! modinfo cifs &> /dev/null; then
+  warn "Le module CIFS est introuvable pour $(uname -r)."
+  warn "Redémarer et réexécuter le script"
+  exit 1
 fi
 
-# Variables
-SERVER="//192.168.0.170/radioemissions"
-MOUNT_POINT="$HOME/radioemissions"
-FSTAB_ENTRY="$SERVER $MOUNT_POINT cifs guest,uid=$(id -u),gid=$(id -g),iocharset=utf8 0 0"
+# --- Début de la section montage dynamique ---
 
-# Créer le répertoire de montage s'il n'existe pas
+# Demande de l'adresse IP ou du nom d'hôte du serveur IceWatch
+read -rp "Entrez l'adresse IP ou le nom d'hôte du serveur IceWatch (par ex. 192.168.0.170) : " SERVER_IP
+
+# Définition des variables de montage
+SERVER="//${SERVER_IP}/radioemissions"
+MOUNT_POINT="$HOME/radioemissions"
+FSTAB_ENTRY="${SERVER} ${MOUNT_POINT} cifs guest,uid=$(id -u),gid=$(id -g),iocharset=utf8 0 0"
+
+# Création du point de montage s'il n'existe pas
 if [ ! -d "$MOUNT_POINT" ]; then
   info "Création du point de montage : $MOUNT_POINT"
   mkdir -p "$MOUNT_POINT"
 fi
 
-# Ajouter l'entrée dans /etc/fstab si absente
-if ! grep -qs "^//192.168.0.170/radioemissions " /etc/fstab; then
+# Ajout de l'entrée dans /etc/fstab si absente
+if ! grep -qs "^${SERVER} " /etc/fstab; then
   info "Ajout de l'entrée dans /etc/fstab"
   echo "$FSTAB_ENTRY" | sudo tee -a /etc/fstab > /dev/null
 fi
 
-# Monter le partage immédiatement
-info "Montage du partage…"
-sudo mount "$MOUNT_POINT" || warn "Échec du montage, vérifiez la connexion réseau ou les droits"
+# Montage immédiat du partage
+info "Montage du partage ${SERVER}…"
+if sudo mount -t cifs "${SERVER}" "${MOUNT_POINT}" \
+    -o guest,uid=$(id -u),gid=$(id -g),iocharset=utf8; then
+  info "Partage radioemissions monté sous ${MOUNT_POINT}"
+else
+  warn "Échec du montage, vérifiez l’adresse, le module CIFS ou dmesg pour plus d’infos"
+  sudo dmesg | tail -n 20
+fi
+# --- Fin de la section montage dynamique ---
 
-warn "Partage radioemissions monté sous $MOUNT_POINT"
 
 # === Installation du groupe pro-audio ===
 info "Installation du groupe pro-audio..."
