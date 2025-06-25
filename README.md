@@ -178,22 +178,19 @@ Client stations (Manjaro KDE Plasma) can be set up or updated in one command. En
 - **Full install (apps + Plasma config)**:
 
   ```bash
-  curl -fsSL https://github.com/radio0but/IceWatch/releases/download/v0.0.1/client.sh \  
-    | bash -s -- --plasma
+  curl -fsSL https://github.com/radio0but/IceWatch/releases/download/v0.0.1/client.sh | bash -s -- --plasma
   ```
 
 - **Apps only**:
 
   ```bash
-  curl -fsSL https://github.com/radio0but/IceWatch/releases/download/v0.0.1/client.sh \
-    | bash
+  curl -fsSL https://github.com/radio0but/IceWatch/releases/download/v0.0.1/client.sh | bash
   ```
 
 - **Update existing apps**:
 
   ```bash
-  curl -fsSL https://github.com/radio0but/IceWatch/releases/download/v0.0.1/client.sh \
-    | bash -s -- --update
+  curl -fsSL https://github.com/radio0but/IceWatch/releases/download/v0.0.1/client.sh | bash -s -- --update
   ```
 
 *The script performs system updates, installs recommended audio/video packages, Chrome, Flatpaks, AppImages, and (with **`--plasma`**) imports KDE settings (themes, shortcuts, desktop layout). You can rerun with **`--update`** anytime. After a **`--plasma`** import, restart the graphical session for all changes to take effect.*
