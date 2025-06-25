@@ -156,7 +156,7 @@ systemctl start icewatch
 # ────────────────
 echo "🔧 Installation et configuration du partage Samba (/srv/radioemissions)..."
 
-sudo apt-get install -y \
+apt-get install -y \
   -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold" \
   samba
