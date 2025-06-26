@@ -9,8 +9,9 @@ info() { echo -e "${GREEN}[INFO]${NC} $1"; }
 warn() { echo -e "${RED}[WARN]${NC} $1"; }
 
 # Vérifie option (--plasma ou --update)
-IMPORT_PLASMA="no"
+
 UPDATE_ONLY="no"
+
 
 if [[ "$1" == "--plasma" ]]; then
     IMPORT_PLASMA="yes"
@@ -21,7 +22,8 @@ elif [[ "$1" == "--update" ]]; then
 else
     warn "Mode : Installation complète (sans Plasma)"
 fi
-
+exec 3</dev/tty
+read -u 3 -rp "Entrez l'adresse IP ou le nom d'hôte du serveur IceWatch (par ex. 192.168.0.170) : " SERVER_IP
 # === Mise à jour système ===
 info "Mise à jour complète du système..."
 sudo pacman -Syu --noconfirm
@@ -94,7 +96,7 @@ fi
 # --- Début de la section montage dynamique ---
 
 # Demande de l'adresse IP ou du nom d'hôte du serveur IceWatch
-read -rp "Entrez l'adresse IP ou le nom d'hôte du serveur IceWatch (par ex. 192.168.0.170) : " SERVER_IP
+
 
 # Définition des variables de montage
 SERVER="//${SERVER_IP}/radioemissions"
@@ -112,7 +114,7 @@ if ! grep -qs "^${SERVER} " /etc/fstab; then
   info "Ajout de l'entrée dans /etc/fstab"
   echo "$FSTAB_ENTRY" | sudo tee -a /etc/fstab > /dev/null
 fi
-
+systemctl daemon-reload
 # Montage immédiat du partage
 info "Montage du partage ${SERVER}…"
 if sudo mount -t cifs "${SERVER}" "${MOUNT_POINT}" \
@@ -155,64 +157,104 @@ flatpak install -y flathub org.openshot.OpenShot
 flatpak install -y flathub com.cuperino.qprompt
 flatpak install -y flathub io.jamulus.Jamulus
 
-# === Section Plasma (si demandé) ===
-if [[ "$IMPORT_PLASMA" == "yes" ]]; then
-    ARCHIVE="$HOME/PlasmaConfig_*.tar.gz"
-    TARGET_USER="$USER"
-    TARGET_HOME="/home/$USER"
+# ──────────────────────────────────────────────────
+# 🔲 Section Plasma Layout (si --plasma)
+# ──────────────────────────────────────────────────
+if [[ " $* " == *" --plasma "* ]]; then
+  echo "🖥️  Configuration automatique du layout Plasma (RadioRosemont)…"
 
-    # Vérifier que l'archive existe
-    if ls $ARCHIVE 1> /dev/null 2>&1; then
-        ARCHIVE_FILE=$(ls -t $ARCHIVE | head -n 1)
-        info "Archive trouvée : $ARCHIVE_FILE"
-    else
-        warn "Aucune archive PlasmaConfig_*.tar.gz trouvée dans $HOME !"
-        exit 1
-    fi
+  # 1️⃣ Détection de l'utilisateur courant (pour autostart)
+  TARGET_USER="${SUDO_USER:-$USER}"
+  USER_HOME=$(eval echo "~$TARGET_USER")
 
-    TMPDIR="$HOME/.plasma-import-tmp"
-    rm -rf "$TMPDIR"
-    mkdir -p "$TMPDIR"
+  # 2️⃣ Déploiement du JS de layout
+  LAYOUT_DIR="$USER_HOME/.local/share/radio-rose"
+  LAYOUT_JS="$LAYOUT_DIR/layout.js"
+  mkdir -p "$LAYOUT_DIR"
 
-    info "Extraction de l'archive..."
-    tar -xzf "$ARCHIVE_FILE" -C "$TMPDIR"
+  cat > "$LAYOUT_JS" <<'EOS'
+/**
+ * RadioRosemont – top & bottom panels
+ * Idempotent : supprime d'abord tous les panels existants
+ */
+panelIds.forEach(id => panelById(id).remove());
 
-    info "Déploiement de ~/.config..."
-    cp -r "$TMPDIR/.config/"* "$TARGET_HOME/.config/"
+function getDefaultLayout() {
+  return {
+    panels: [
+      // Barre du haut full-width
+      {
+        location: "top", height: 36, expand: true,
+        widgets: [
+          "org.kde.plasma.activitymanager",
+          "org.kde.plasma.appmenu",
+          "org.kde.plasma.panelspacer",
+          "org.kde.plasma.systemtray",
+          "org.kde.plasma.digitalclock"
+        ]
+      },
+      // Barre du bas centered auto-width
+      {
+        location: "bottom", alignment: "center",
+        height: 36, autoWidth: true,
+        widgets: [
+          "org.kde.plasma.kickoff",
+          "org.kde.plasma.pager",
+          "org.kde.plasma.icontasks",
+          "org.kde.plasma.showdesktop"
+        ]
+      }
+    ],
+    desktops: []
+  };
+}
 
-    info "Déploiement de ~/.local/share..."
-    cp -r "$TMPDIR/.local/share/"* "$TARGET_HOME/.local/share/"
+getDefaultLayout().panels.forEach(conf => {
+  const p = new Panel();
+  p.location = conf.location;
+  p.height   = conf.height;
+  if (conf.expand)    p.expand     = true;
+  if (conf.alignment) p.alignment  = conf.alignment;
+  if (conf.autoWidth) {
+    p.lengthUnit = "Pixel";
+    p.length     = conf.widgets.length * conf.height * 1.1;
+  }
+  conf.widgets.forEach(id => p.addWidget(id));
+});
+EOS
 
-    for EXTRA in ".icons" ".fonts" ".themes"; do
-        if [ -d "$TMPDIR/$EXTRA" ]; then
-            info "Déploiement de $EXTRA ..."
-            cp -r "$TMPDIR/$EXTRA" "$TARGET_HOME/"
-        fi
-    done
+  chmod 644 "$LAYOUT_JS"
+  echo "  → Layout JS déployé dans $LAYOUT_JS"
 
-    info "Réglage des permissions..."
-    sudo chown -R "$TARGET_USER:$TARGET_USER" \
-        "$TARGET_HOME/.config" \
-        "$TARGET_HOME/.local/share" \
-        "$TARGET_HOME/.icons" \
-        "$TARGET_HOME/.fonts" \
-        "$TARGET_HOME/.themes" 2>/dev/null
+  # 3️⃣ Création du .desktop d’autostart
+  AUTOSTART_DIR="$USER_HOME/.config/autostart"
+  DESKTOP_FILE="$AUTOSTART_DIR/radio-rose-layout.desktop"
+  mkdir -p "$AUTOSTART_DIR"
 
-    rm -rf "$TMPDIR"
+  cat > "$DESKTOP_FILE" <<EOF
+[Desktop Entry]
+Type=Application
+Exec=sh -c 'qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "\$(cat $LAYOUT_JS)"'
+Hidden=false
+NoDisplay=false
+X-GIO-NoFuse=true
+Name=RadioRosemont Layout
+Comment=Applique le layout top/bottom panels RadioRosemont
+EOF
 
-    info "Relance de Plasma..."
-    if systemctl --user status plasma-plasmashell.service > /dev/null 2>&1; then
-        systemctl --user restart plasma-plasmashell.service
-        info "Plasma relancé (Wayland)"
-    else
-        kquitapp6 plasmashell && kstart plasmashell
-        info "Plasma relancé (X11)"
-    fi
+  chmod 644 "$DESKTOP_FILE"
+  chown -R "$TARGET_USER":"$TARGET_USER" "$LAYOUT_DIR" "$AUTOSTART_DIR"
+  echo "  → Autostart configuré pour l’utilisateur $TARGET_USER"
 
-    warn "Déploiement Plasma terminé ! Redémarre KWin si nécessaire."
-else
-    info "Section Plasma ignorée."
+  # 4️⃣ Application immédiate si tu es en session graphique de TARGET_USER
+  if [ "$USER" = "$TARGET_USER" ] && [ -n "$DISPLAY" ] && pgrep -u "$TARGET_USER" plasmashell >/dev/null; then
+    echo "🔄 Application immédiate du layout…"
+    su - "$TARGET_USER" -c "qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript \"\$(cat $LAYOUT_JS)\""
+  fi
+
+  echo "✅ Section Plasma terminée."
 fi
+
 
 # === Fin ===
 warn "Installation complète terminée !"
