@@ -8,20 +8,190 @@ NC='\033[0m' # No Color
 info() { echo -e "${GREEN}[INFO]${NC} $1"; }
 warn() { echo -e "${RED}[WARN]${NC} $1"; }
 
-# Vérifie option (--plasma ou --update)
+# === Fonction: Générer le layout plasma panels ===
+generate_plasma_panel_layout_js() {
+  local TARGET_USER="$1"
+  local USER_HOME=$(eval echo "~$TARGET_USER")
+  local LAYOUT_DIR="$USER_HOME/.local/share/radio-rose"
+  local LAYOUT_JS="$LAYOUT_DIR/layout.js"
 
+  mkdir -p "$LAYOUT_DIR"
+
+  cat <<'EOS' > "$LAYOUT_JS"
+/** RadioRosemont – top & bottom panels + wallpaper **/
+panelIds.forEach(id => panelById(id).remove());
+
+function getDefaultLayout() {
+  return { panels:[
+    { location:"top", height:36, expand:true, widgets:[
+        "org.kde.plasma.showActivityManager",
+        "org.kde.plasma.appmenu",
+        "org.kde.plasma.panelspacer",
+        "org.kde.plasma.systemtray",
+        "org.kde.plasma.digitalclock"
+    ]},
+    { location:"bottom", alignment:"center", height:36, autoWidth:true, widgets:[
+        "org.kde.plasma.kickoff",
+        "org.kde.plasma.pager",
+        "org.kde.plasma.icontasks",
+        "org.kde.plasma.showdesktop"
+    ]}
+  ], desktops:[] };
+}
+
+// Appliquer le layout des panneaux
+getDefaultLayout().panels.forEach(conf=>{
+  p=new Panel(); p.location=conf.location; p.height=conf.height;
+  [[conf.expand,"expand"],[conf.alignment,"alignment"],[conf.autoWidth,"autoWidth"]].forEach(([val,prop])=>{
+    if(val) p[prop]=val;
+  });
+  if(conf.autoWidth){ p.lengthUnit="Pixel"; p.length=conf.widgets.length*conf.height*1.1; }
+  conf.widgets.forEach(id=>p.addWidget(id));
+});
+
+// Définir le fond d’écran pour le bureau principal
+const wallpaperPath = "/home/USERNAME/Images/wallpaper.png";
+desktops().forEach(d => {
+  d.wallpaperPlugin = "org.kde.image";
+  d.currentConfigGroup = ["Wallpaper", "org.kde.image", "General"];
+  d.writeConfig("Image", "file://" + wallpaperPath);
+});
+EOS
+
+  # Remplace USERNAME par le vrai nom d'utilisateur dans le JS
+  sed -i "s|USERNAME|$TARGET_USER|g" "$LAYOUT_JS"
+
+  chmod 644 "$LAYOUT_JS"
+  chown "$TARGET_USER:$TARGET_USER" "$LAYOUT_JS"
+  echo "$LAYOUT_JS"
+}
+
+
+# === Fonction: Créer les activités KDE ===
+create_kde_activities() {
+  local TARGET_USER="$1"
+  local USER_HOME=$(eval echo "~$TARGET_USER")
+
+  export DISPLAY=:0
+  export XAUTHORITY="$USER_HOME/.Xauthority"
+  export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u "$TARGET_USER")/bus"
+
+  local ACTIVITIES=(
+    "Production Audio"
+    "Radio en direct"
+    "Vidéo en direct"
+    "Production Vidéo"
+  )
+
+  for ACTIVITY in "${ACTIVITIES[@]}"; do
+    sudo -u "$TARGET_USER" DISPLAY="$DISPLAY" DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
+      kactivities-cli --create-activity "$ACTIVITY"
+    sleep 0.5
+  done
+}
+
+# === Fonction: Appliquer automatiquement le layout avec fond d'écran ===
+apply_plasma_layout() {
+  echo "💥  Configuration automatique du layout Plasma (RadioRosemont)…"
+  TARGET_USER="${SUDO_USER:-$USER}"
+  USER_HOME=$(eval echo "~$TARGET_USER")
+
+  export DISPLAY=:0
+  export XAUTHORITY="$USER_HOME/.Xauthority"
+  export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u "$TARGET_USER")/bus"
+
+  if ! command -v qdbus &>/dev/null; then
+    info "Installation de qt5-tools (qdbus)..."
+    sudo pacman -S --noconfirm qt5-tools
+  fi
+
+  if ! command -v kactivities-cli &>/dev/null; then
+    info "Installation de kactivities-cli..."
+    sudo pacman -S --noconfirm kactivities5 kactivitymanagerd kactivities-stats5
+  fi
+
+  local LAYOUT_JS_PATH
+  LAYOUT_JS_PATH=$(generate_plasma_panel_layout_js "$TARGET_USER")
+
+ # === Fonds d'écran Plasma personnalisés (Radio Rosemont) ===
+info "Téléchargement des fonds d'écran Plasma personnalisés..."
+
+# Répertoire utilisateur (défaut : $HOME si TARGET_HOME vide)
+WALLPAPER_DIR="${TARGET_HOME:-$HOME}/Images"
+mkdir -p "$WALLPAPER_DIR"
+
+# Liste des images à télécharger
+WALLPAPER_BASE_URL="https://github.com/radio0but/IceWatch/releases/download/v0.0.1"
+WALLPAPER_LIST=(
+  "RadioDirect.png"
+  "VideoDirect.png"
+  "ProdAudio.png"
+  "ProdVideo.png"
+  "wallpaper.png"
+  "chrome.png"
+  "RosemontLogo.png"
+  "IconeProdVid.png"
+  "IconeProdAud.png"
+  "IconeLiveVid.png"
+  "IconeOnAir.png"
+)
+
+for FILE in "${WALLPAPER_LIST[@]}"; do
+  URL="$WALLPAPER_BASE_URL/$FILE"
+  DEST="$WALLPAPER_DIR/$FILE"
+  info "Téléchargement de $FILE..."
+  if curl -fsSL "$URL" -o "$DEST"; then
+    [[ -n "$TARGET_USER" ]] && sudo chown "$TARGET_USER:$TARGET_USER" "$DEST"
+  else
+    warn "Échec du téléchargement de $FILE"
+  fi
+done
+
+info "Fonds d'écran téléchargés dans $WALLPAPER_DIR"
+  info "✅ Fichier layout généré à $LAYOUT_JS_PATH"
+
+  echo "🔄 Application immédiate du layout…"
+  sudo -u "$TARGET_USER" DISPLAY="$DISPLAY" DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
+    qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$(cat "$LAYOUT_JS_PATH")"
+
+  create_kde_activities "$TARGET_USER"
+
+  echo "✅ Section Plasma terminée."
+}
+
+# === Options d'installation ===
+IMPORT_PLASMA="no"
 UPDATE_ONLY="no"
+ONLY_PLASMA="no"
 
+for arg in "$@"; do
+  case "$arg" in
+    --plasma) IMPORT_PLASMA="yes" ;;
+    --update) UPDATE_ONLY="yes" ;;
+    --onlyplasma) ONLY_PLASMA="yes"; IMPORT_PLASMA="yes" ;;
+  esac
+done
 
-if [[ "$1" == "--plasma" ]]; then
-    IMPORT_PLASMA="yes"
-    warn "Mode : Installation + Import Plasma (--plasma)"
-elif [[ "$1" == "--update" ]]; then
-    UPDATE_ONLY="yes"
-    warn "Mode : Mise à jour uniquement (--update)"
+if [[ "$ONLY_PLASMA" == "yes" ]]; then
+  warn "Mode : Configuration Plasma uniquement (--onlyplasma)"
+elif [[ "$IMPORT_PLASMA" == "yes" ]]; then
+  warn "Mode : Installation + Import Plasma (--plasma)"
+elif [[ "$UPDATE_ONLY" == "yes" ]]; then
+  warn "Mode : Mise à jour uniquement (--update)"
 else
-    warn "Mode : Installation complète (sans Plasma)"
+  warn "Mode : Installation complète (sans Plasma)"
 fi
+
+if [[ "$IMPORT_PLASMA" == "yes" ]]; then
+  apply_plasma_layout
+  if [[ "$ONLY_PLASMA" == "yes" ]]; then
+    warn "Fin du mode --onlyplasma"
+    exit 0
+  fi
+fi
+
+# (le reste du script suit — inchangé)
+
 exec 3</dev/tty
 read -u 3 -rp "Entrez l'adresse IP ou le nom d'hôte du serveur IceWatch (par ex. 192.168.0.170) : " SERVER_IP
 # === Mise à jour système ===
@@ -157,104 +327,10 @@ flatpak install -y flathub org.openshot.OpenShot
 flatpak install -y flathub com.cuperino.qprompt
 flatpak install -y flathub io.jamulus.Jamulus
 
-# ──────────────────────────────────────────────────
-# 🔲 Section Plasma Layout (si --plasma)
-# ──────────────────────────────────────────────────
-if [[ " $* " == *" --plasma "* ]]; then
-  echo "🖥️  Configuration automatique du layout Plasma (RadioRosemont)…"
 
-  # 1️⃣ Détection de l'utilisateur courant (pour autostart)
-  TARGET_USER="${SUDO_USER:-$USER}"
-  USER_HOME=$(eval echo "~$TARGET_USER")
-
-  # 2️⃣ Déploiement du JS de layout
-  LAYOUT_DIR="$USER_HOME/.local/share/radio-rose"
-  LAYOUT_JS="$LAYOUT_DIR/layout.js"
-  mkdir -p "$LAYOUT_DIR"
-
-  cat > "$LAYOUT_JS" <<'EOS'
-/**
- * RadioRosemont – top & bottom panels
- * Idempotent : supprime d'abord tous les panels existants
- */
-panelIds.forEach(id => panelById(id).remove());
-
-function getDefaultLayout() {
-  return {
-    panels: [
-      // Barre du haut full-width
-      {
-        location: "top", height: 36, expand: true,
-        widgets: [
-          "org.kde.plasma.activitymanager",
-          "org.kde.plasma.appmenu",
-          "org.kde.plasma.panelspacer",
-          "org.kde.plasma.systemtray",
-          "org.kde.plasma.digitalclock"
-        ]
-      },
-      // Barre du bas centered auto-width
-      {
-        location: "bottom", alignment: "center",
-        height: 36, autoWidth: true,
-        widgets: [
-          "org.kde.plasma.kickoff",
-          "org.kde.plasma.pager",
-          "org.kde.plasma.icontasks",
-          "org.kde.plasma.showdesktop"
-        ]
-      }
-    ],
-    desktops: []
-  };
-}
-
-getDefaultLayout().panels.forEach(conf => {
-  const p = new Panel();
-  p.location = conf.location;
-  p.height   = conf.height;
-  if (conf.expand)    p.expand     = true;
-  if (conf.alignment) p.alignment  = conf.alignment;
-  if (conf.autoWidth) {
-    p.lengthUnit = "Pixel";
-    p.length     = conf.widgets.length * conf.height * 1.1;
-  }
-  conf.widgets.forEach(id => p.addWidget(id));
-});
-EOS
-
-  chmod 644 "$LAYOUT_JS"
-  echo "  → Layout JS déployé dans $LAYOUT_JS"
-
-  # 3️⃣ Création du .desktop d’autostart
-  AUTOSTART_DIR="$USER_HOME/.config/autostart"
-  DESKTOP_FILE="$AUTOSTART_DIR/radio-rose-layout.desktop"
-  mkdir -p "$AUTOSTART_DIR"
-
-  cat > "$DESKTOP_FILE" <<EOF
-[Desktop Entry]
-Type=Application
-Exec=sh -c 'qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "\$(cat $LAYOUT_JS)"'
-Hidden=false
-NoDisplay=false
-X-GIO-NoFuse=true
-Name=RadioRosemont Layout
-Comment=Applique le layout top/bottom panels RadioRosemont
-EOF
-
-  chmod 644 "$DESKTOP_FILE"
-  chown -R "$TARGET_USER":"$TARGET_USER" "$LAYOUT_DIR" "$AUTOSTART_DIR"
-  echo "  → Autostart configuré pour l’utilisateur $TARGET_USER"
-
-  # 4️⃣ Application immédiate si tu es en session graphique de TARGET_USER
-  if [ "$USER" = "$TARGET_USER" ] && [ -n "$DISPLAY" ] && pgrep -u "$TARGET_USER" plasmashell >/dev/null; then
-    echo "🔄 Application immédiate du layout…"
-    su - "$TARGET_USER" -c "qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript \"\$(cat $LAYOUT_JS)\""
-  fi
-
-  echo "✅ Section Plasma terminée."
-fi
-
-
-# === Fin ===
 warn "Installation complète terminée !"
+
+
+
+
+
