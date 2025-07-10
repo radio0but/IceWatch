@@ -23,8 +23,8 @@ public class AuthController {
     @GetMapping("/auth/token")
     public Map<String,String> getToken(HttpServletRequest req) {
         String ref = req.getHeader("Referer");
-        if (ref == null || !ref.contains(config.getAllowedDomain())) {
-            return Map.of("error","Access denied");
+        if (ref == null || !ref.startsWith(config.getAllowedDomain())) {
+            return Map.of("error", "Access denied: " + ref);
         }
         return Map.of("token", tokenService.generateToken());
     }
