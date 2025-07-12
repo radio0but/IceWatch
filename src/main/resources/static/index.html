@@ -4,40 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lecteur Radio Rosemont</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      background-color: #111;
-      color: #f2f2f2;
-      margin: 0;
-      padding: 1rem;
-    }
-    h1 {
-      text-align: center;
-      color: #ff3366;
-    }
-    #player-container, #video-container, #metadata {
-      margin: 1rem auto;
-      max-width: 720px;
-      text-align: center;
-    }
-    audio, iframe {
-      width: 100%;
-      border: none;
-    }
-  </style>
+  <link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
   <h1>📻 Radio Rosemont</h1>
   <div style="text-align:center; margin-top: 1rem;">
-    <a href="/logout"
-       style="background:#ff3366;color:white;border:none;padding:0.5rem 1rem;text-decoration:none;">
-      🔒 Se déconnecter
-    </a>
+    <a href="/logout" class="button-logout">🔒 Se déconnecter</a>
   </div>
   <div id="player-container">Chargement du lecteur audio…</div>
   <div id="metadata">Chargement des infos…</div>
-  <div id="video-container">Chargement du lecteur vidéo…</div>
+  <div id="video-container">
+    <div class="video-aspect">
+      <!-- Iframe vidéo ajouté ici par JS -->
+    </div>
+  </div>
 
   <script>
     const API_BASE = "https://radio.boogiepit.com";
@@ -53,19 +33,21 @@
       audio.src = `${API_BASE}/radio?token=${encodeURIComponent(token)}`;
       audio.controls = true;
       audio.autoplay = true;
+      audio.style.margin = "1.2rem auto 1.2rem auto";
       document.getElementById("player-container").innerHTML = "";
       document.getElementById("player-container").appendChild(audio);
     }
 
     async function setupVideo(token) {
-      const iframe = document.createElement("iframe");
-      iframe.src = `${API_BASE}/owncast/embed/video?token=${encodeURIComponent(token)}`;
-      iframe.width = "720";
-      iframe.height = "405";
-      iframe.allowFullscreen = true;
-      document.getElementById("video-container").innerHTML = "";
-      document.getElementById("video-container").appendChild(iframe);
-    }
+    const iframe = document.createElement("iframe");
+    iframe.src = `${API_BASE}/owncast/embed/video?token=${encodeURIComponent(token)}`;
+    iframe.width = "1920";
+    iframe.height = "1080";
+    iframe.allowFullscreen = true;
+    document.getElementById("video-container").innerHTML = "";
+    document.getElementById("video-container").appendChild(iframe);
+  }
+
 
     async function updateMetadata() {
       try {

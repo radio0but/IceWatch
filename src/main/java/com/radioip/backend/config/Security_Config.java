@@ -100,16 +100,21 @@ public class Security_Config {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
         http
+            .csrf(csrf -> csrf.disable())  // Ajoute ça pour voir si c’est le CSRF qui bloque
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/token", "/favicon.ico", "/css/**", "/js/**").permitAll()
+                .requestMatchers("/auth/token", "/favicon.ico", "/css/**", "/js/**", "/login.html").permitAll()
                 .requestMatchers("/dashboard.html").hasRole("ADMIN")
                 .requestMatchers("/index.html").authenticated()
                 .anyRequest().permitAll()
             )
             .formLogin(login -> login
-                .defaultSuccessUrl("/index.html", true)
-                .permitAll()
-            )
+            .loginPage("/login.html")
+            .loginProcessingUrl("/login")
+            .defaultSuccessUrl("/index.html", true)
+            .failureUrl("/login.html?error")
+            .permitAll()
+        )
+
             .logout(logout -> logout.permitAll())
             .authenticationManager(authManager)
             .headers(headers -> headers.frameOptions().disable());
