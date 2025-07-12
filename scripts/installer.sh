@@ -122,6 +122,35 @@ icewatch.allowed-domain=${ALLOWED_REFERER}
 icewatch.owncast-url=http://localhost:8123
 icewatch.icecast-stream-url=http://localhost:8000/radio
 EOF
+echo
+read -p "Souhaitez-vous activer l’authentification LDAP maintenant ? (o/N): " ENABLE_LDAP
+ENABLE_LDAP=$(echo "$ENABLE_LDAP" | tr '[:upper:]' '[:lower:]')
+
+if [[ "$ENABLE_LDAP" == "o" || "$ENABLE_LDAP" == "oui" || "$ENABLE_LDAP" == "y" ]]; then
+    read -p "Adresse du serveur LDAP (ex : ldap://192.168.0.8:389): " LDAP_URL
+    read -p "Base DN LDAP (ex : dc=radio,dc=boogiepit,dc=com): " LDAP_BASE
+    read -p "DN d’admin LDAP (ex : cn=admin,dc=radio,dc=boogiepit,dc=com): " LDAP_BIND_DN
+    read -s -p "Mot de passe admin LDAP : " LDAP_BIND_PW; echo
+
+    # Ajoute la config LDAP à l’application IceWatch
+    cat <<EOF >> /etc/icewatch/application.properties
+spring.ldap.urls=${LDAP_URL}
+spring.ldap.base=${LDAP_BASE}
+spring.ldap.username=${LDAP_BIND_DN}
+spring.ldap.password=${LDAP_BIND_PW}
+# Patterns pour utilisateurs/groupes LDAP standard
+spring.security.ldap.user-dn-patterns=uid={0},ou=Users
+spring.security.ldap.authorities.group-search-base=ou=Groups
+spring.ldap.user-dn-patterns=uid={0},ou=Users,${LDAP_BASE}
+EOF
+
+    echo "✅ Authentification LDAP configurée."
+else
+    echo "ℹ️ Vous pourrez activer LDAP plus tard en éditant /etc/icewatch/application.properties"
+    echo "   Utilisez les comptes locaux suivants pour tester :"
+    echo "   - admin / admin123"
+    echo "   - enseignant / radio2025"
+fi
 
 useradd -r -s /bin/false icewatch 2>/dev/null
 chown -R icewatch:icewatch /opt/icewatch /etc/icewatch
@@ -155,7 +184,6 @@ systemctl start icewatch
 # 9️⃣ Partage Samba
 # ────────────────
 echo "🔧 Installation et configuration du partage Samba (/srv/radioemissions)..."
-
 apt-get install -y \
   -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold" \
@@ -268,7 +296,16 @@ EOF
 done
 
 echo "[INFO] play.sh déployés dans tous les dossiers horaires."
+# === Téléchargement et exécution du script d'installation du Video Scheduler ===
+SCHEDULER_INSTALL_URL="https://github.com/radio0but/IceWatch/releases/download/v0.0.1/install_video_scheduler.sh"
+SCHEDULER_INSTALL_SCRIPT="/tmp/install_video_scheduler.sh"
 
+# Téléchargement sécurisé
+curl -fsSL "$SCHEDULER_INSTALL_URL" -o "$SCHEDULER_INSTALL_SCRIPT"
+chmod +x "$SCHEDULER_INSTALL_SCRIPT"
+
+# Exécution
+"$SCHEDULER_INSTALL_SCRIPT"
 
 # Final Info
 echo

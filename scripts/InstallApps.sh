@@ -155,6 +155,37 @@ info "Fonds d'écran téléchargés dans $WALLPAPER_DIR"
     qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$(cat "$LAYOUT_JS_PATH")"
 
   create_kde_activities "$TARGET_USER"
+  info "Application du thème Rouge Rosemont (prompt Zsh)..."
+  sudo sed -i \
+  -e 's/POWERLEVEL9K_OS_ICON_FOREGROUND=.*/POWERLEVEL9K_OS_ICON_FOREGROUND=160/' \
+  -e 's/POWERLEVEL9K_OS_ICON_BACKGROUND=.*/POWERLEVEL9K_OS_ICON_BACKGROUND=254/' \
+  -e 's/POWERLEVEL9K_DIR_BACKGROUND=.*/POWERLEVEL9K_DIR_BACKGROUND=160/' \
+  -e 's/POWERLEVEL9K_PROMPT_CHAR_OK_.*_FOREGROUND=.*/POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=160/' \
+  /usr/share/zsh/p10k.zsh
+PROFILE_NAME="RadioRosemont.profile"
+PROFILE_PATH="$HOME/.local/share/konsole/$PROFILE_NAME"
+
+info "Création du profil Konsole personnalisé : RadioRosemont..."
+
+mkdir -p "$HOME/.local/share/konsole"
+
+cat > "$PROFILE_PATH" <<EOF
+[Appearance]
+ColorScheme=WhiteOnBlack
+Font=Hack Nerd Font Mono,11
+
+[General]
+Command=/bin/zsh
+Environment=TERM=xterm-256color,COLORTERM=truecolor
+Name=RadioRosemont
+Parent=FALLBACK/
+EOF
+
+kwriteconfig5 --file konsolerc --group "Desktop Entry" --key DefaultProfile "$PROFILE_NAME"
+
+info "Profil Konsole 'RadioRosemont' appliqué par défaut."
+
+  info "Thème du prompt Manjaro modifié pour refléter les couleurs de Radio Rosemont."
 
   echo "✅ Section Plasma terminée."
 }
@@ -192,8 +223,6 @@ fi
 
 # (le reste du script suit — inchangé)
 
-exec 3</dev/tty
-read -u 3 -rp "Entrez l'adresse IP ou le nom d'hôte du serveur IceWatch (par ex. 192.168.0.170) : " SERVER_IP
 # === Mise à jour système ===
 info "Mise à jour complète du système..."
 sudo pacman -Syu --noconfirm
@@ -244,16 +273,44 @@ sudo cp -R ./* /
 
 info "Google Chrome mis à jour avec succès."
 
+# === Ajout de l'alias tupdate (si absent) ===
+INSTALL_LINE="alias tupdate='bash <(curl -fsSL https://github.com/radio0but/IceWatch/releases/download/v0.0.1/InstallApps.sh) --update'"
+
+# Fonction pour ajouter dans un fichier si la ligne est absente
+add_alias_if_missing() {
+    local file="$1"
+    if [ -f "$file" ]; then
+        if ! grep -Fxq "$INSTALL_LINE" "$file"; then
+            echo "" >> "$file"
+            echo "# Alias Radio Rosemont (mise à jour IceWatch)" >> "$file"
+            echo "$INSTALL_LINE" >> "$file"
+            echo "[INFO] Alias tupdate ajouté dans $file"
+        else
+            echo "[INFO] Alias tupdate déjà présent dans $file"
+        fi
+    fi
+}
+
+# Ajout dans ~/.zshrc et ~/.bashrc (supporte les deux shells)
+add_alias_if_missing "$HOME/.zshrc"
+add_alias_if_missing "$HOME/.bashrc"
 # === Fin de la section update-only ===
 if [[ "$UPDATE_ONLY" == "yes" ]]; then
     warn "Mise à jour terminée (mode update-only)."
+
     exit 0
 fi
 # === Montage du partage radioemissions via SMB/CIFS ===
 info "Configuration du montage du partage radioemissions…"
 
-# Installer cifs-utils si nécessaire
 
+# Demande de l'adresse IP ou du nom d'hôte du serveur IceWatch
+
+exec 3</dev/tty
+read -u 3 -rp "Entrez l'adresse IP ou le nom d'hôte du serveur IceWatch (par ex. 192.168.0.170) : " SERVER_IP
+
+
+# Installer cifs-utils si nécessaire
 sudo pacman -S --noconfirm cifs-utils
 
 # si le module cifs n'est pas déjà chargé, on le charge
@@ -264,8 +321,6 @@ if ! modinfo cifs &> /dev/null; then
 fi
 
 # --- Début de la section montage dynamique ---
-
-# Demande de l'adresse IP ou du nom d'hôte du serveur IceWatch
 
 
 # Définition des variables de montage
