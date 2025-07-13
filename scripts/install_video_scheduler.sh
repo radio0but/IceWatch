@@ -5,6 +5,12 @@ set -e
 # === Installateur du Video Scheduler pour Owncast ===
 echo "\n🎨 Installation du Video Scheduler (Owncast)"
 
+# Vérification de la présence de ffmpeg
+if ! command -v ffmpeg &> /dev/null; then
+  echo "📦 ffmpeg non détecté. Installation en cours..."
+  apt update && apt install -y ffmpeg
+fi
+
 # Dossier des vidéos et du planning
 SCHEDULE_DIR="/srv/owncast-schedule"
 # Dossier du script exécutable sécurisé
@@ -27,6 +33,12 @@ echo "📁 Dossiers créés : $SCHEDULE_DIR et $SCRIPT_DIR"
 # Sécurisation du dossier du scheduler
 chmod 755 "$SCRIPT_DIR"
 chown root:root "$SCRIPT_DIR"
+
+# Sécurisation du dossier de planning (pour Samba + scheduler)
+chmod 2775 "$SCHEDULE_DIR"
+chown -R nobody:nogroup "$SCHEDULE_DIR"
+find "$SCHEDULE_DIR" -type d -exec chmod 2775 {} \;
+find "$SCHEDULE_DIR" -type f -exec chmod 664 {} \;
 
 # Détection IP locale pour affichage
 SERVER_IP=$(hostname -I | awk '{print $1}')
@@ -135,8 +147,9 @@ chmod 755 "$SCRIPT_PATH"
 chown root:root "$SCRIPT_PATH"
 echo "📅 Script téléchargé et sécurisé : $SCRIPT_PATH"
 
-# 4. Création du service systemd
-cat <<EOF > "/etc/systemd/system/$SERVICE_NAME.service"
+# 4. Création du service systemd si différent
+SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
+read -r -d '' SYSTEMD_CONTENT <<EOF
 [Unit]
 Description=Owncast Video Scheduler
 After=network.target
@@ -151,27 +164,38 @@ RestartSec=10
 WantedBy=multi-user.target
 EOF
 
+echo "$SYSTEMD_CONTENT" | cmp -s - "$SERVICE_FILE" || echo "$SYSTEMD_CONTENT" > "$SERVICE_FILE"
+
 echo "🔧 Service systemd installé : $SERVICE_NAME"
 
 # 5. Activation et démarrage
 systemctl daemon-reload
 systemctl enable "$SERVICE_NAME"
-systemctl start "$SERVICE_NAME"
+systemctl restart "$SERVICE_NAME"
 echo "✅ Service $SERVICE_NAME activé et démarré"
 
-# 6. Ajout du partage Samba (sans installer samba)
-cat <<EOF >> /etc/samba/smb.conf
-
-[owncastvideos]
+# 6. Ajout ou modification du partage Samba
+SHARE_BLOCK="[owncastvideos]
    comment = Vidéos horaires Owncast
    path = $SCHEDULE_DIR
    browseable = yes
+   writable = yes
    read only = no
    guest ok = yes
-   force user = nobody
-   create mask = 0664
+   create mask = 0666
    directory mask = 2775
-EOF
+   force user = nobody
+   force group = nogroup"
+
+if grep -q "\[owncastvideos\]" /etc/samba/smb.conf; then
+  echo "🔁 Mise à jour de la configuration Samba existante pour [owncastvideos]..."
+  sed -i "/\[owncastvideos\]/,/^$/c\
+$SHARE_BLOCK\
+" /etc/samba/smb.conf
+else
+  echo "➕ Ajout du partage Samba [owncastvideos]..."
+  echo -e "\n$SHARE_BLOCK\n" >> /etc/samba/smb.conf
+fi
 
 systemctl restart smbd
 

@@ -36,6 +36,11 @@ echo
 read -p "Enter your allowed frontend referer (e.g., https://example.com): " ALLOWED_REFERER
 read -p "Enter your Owncast admin password: " OWNCAST_PASSWORD
 read -p "Enter the port IceWatch should run on (default 9090): " ICEWATCH_PORT
+
+echo
+read -s -p "Mot de passe pour l'utilisateur local 'admin' (ex: admin123) : " LOCAL_ADMIN_PW; echo
+read -s -p "Mot de passe pour l'utilisateur local 'enseignant' (ex: radio2025) : " LOCAL_ENSEIGNANT_PW; echo
+
 ICEWATCH_PORT=${ICEWATCH_PORT:-9090}
 
 # Get IP & generate master token
@@ -121,6 +126,8 @@ icewatch.master-token=${MASTER_TOKEN}
 icewatch.allowed-domain=${ALLOWED_REFERER}
 icewatch.owncast-url=http://localhost:8123
 icewatch.icecast-stream-url=http://localhost:8000/radio
+icewatch.admin-password=${LOCAL_ADMIN_PW}
+icewatch.enseignant-password=${LOCAL_ENSEIGNANT_PW}
 EOF
 echo
 read -p "Souhaitez-vous activer l’authentification LDAP maintenant ? (o/N): " ENABLE_LDAP

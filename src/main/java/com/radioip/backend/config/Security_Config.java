@@ -43,13 +43,18 @@ public class Security_Config {
 
     // === Utilisateurs locaux ===
     @Bean
-    public InMemoryUserDetailsManager inMemoryUserDetailsService(PasswordEncoder encoder) {
+    public InMemoryUserDetailsManager inMemoryUserDetailsService(PasswordEncoder encoder, IceWatchConfig config) {
         return new InMemoryUserDetailsManager(
-                User.withUsername("admin").password(encoder.encode("admin123")).roles("ADMIN", "USER").build(),
-                User.withUsername("enseignant").password(encoder.encode("radio2025")).roles("USER").build()
+            User.withUsername("admin")
+                .password(encoder.encode(config.getAdminPassword()))
+                .roles("ADMIN", "USER")
+                .build(),
+            User.withUsername("enseignant")
+                .password(encoder.encode(config.getEnseignantPassword()))
+                .roles("USER")
+                .build()
         );
     }
-
     // === Contexte LDAP ===
     @Bean
     public DefaultSpringSecurityContextSource contextSource() {

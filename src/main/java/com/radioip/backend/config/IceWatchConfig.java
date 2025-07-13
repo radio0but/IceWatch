@@ -11,8 +11,24 @@ public class IceWatchConfig {
     private String allowedDomain;
     private String owncastUrl;
     private String icecastStreamUrl;
-
+    private String adminPassword;
+    private String enseignantPassword;
     // Getters and setters
+    public String getAdminPassword() {
+        return adminPassword;
+    }
+
+    public void setAdminPassword(String adminPassword) {
+        this.adminPassword = adminPassword;
+    }
+
+    public String getEnseignantPassword() {
+        return enseignantPassword;
+    }
+
+    public void setEnseignantPassword(String enseignantPassword) {
+        this.enseignantPassword = enseignantPassword;
+    }
     public String getMasterToken() {
         return masterToken;
     }
