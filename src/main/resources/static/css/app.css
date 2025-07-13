@@ -77,8 +77,8 @@ audio {
 }
 #video-container iframe {
   /*width: 100%;*/
-  width: 784px;
-  height: 441px;
+  width: 550px;
+  height: 350px;
   border-radius: 13px;
   border: none;
   background: #1a1c22;
