@@ -16,7 +16,7 @@
   <div class="tabs">
     <button class="tab-button active" data-tab="radio">🎧 Radio</button>
     <button class="tab-button" data-tab="video">🎥 Vidéo</button>
-    <button class="tab-button" data-tab="logout">🚪 Déconnexion</button>
+    ${logout.button}
   </div>
 
   <div id="tab-radio" class="tab-content active">
@@ -28,10 +28,8 @@
     <div id="video-container">Chargement du lecteur vidéo…</div>
   </div>
 
-  <div id="tab-logout" class="tab-content" style="text-align:center;">
-    <p style="margin: 2rem;">Cliquez ci-dessous pour vous déconnecter.</p>
-    <a href="/logout" class="button-logout">🔒 Se déconnecter</a>
-  </div>
+  ${logout.tab}
+
 
   <script>
     const API_BASE = "https://radio.boogiepit.com";

@@ -29,7 +29,17 @@ public class StaticPageController {
 
     private void sendHtmlWithSubstitutions(String path, HttpServletResponse response) throws IOException {
         String html = StreamUtils.copyToString(new ClassPathResource(path).getInputStream(), StandardCharsets.UTF_8);
+        String logoutButton = "";
+        String logoutTab = "";
 
+        if (!config.isDisableLogin()) {
+            logoutButton = "<button class=\"tab-button\" data-tab=\"logout\">🚪 Déconnexion</button>";
+            logoutTab =
+                "<div id=\"tab-logout\" class=\"tab-content\" style=\"text-align:center;\">\n" +
+                "  <p style=\"margin: 2rem;\">Cliquez ci-dessous pour vous déconnecter.</p>\n" +
+                "  <a href=\"/logout\" class=\"button-logout\">🔒 Se déconnecter</a>\n" +
+                "</div>";
+        }
         html = html
             .replace("${radio.title}", config.getRadioTitle())
             .replace("${radio.plainTitle}", config.getRadioPlainTitle())
@@ -37,8 +47,9 @@ public class StaticPageController {
             .replace("${login.title}", config.getLoginTitle())
             .replace("${favicon}", config.getFavicon())
             .replace("${custom.css}", config.getCustomCss())
-            .replace("${custom.html}", config.getCustomHtml());
-
+            .replace("${custom.html}", config.getCustomHtml())
+            .replace("${logout.button}", logoutButton)
+            .replace("${logout.tab}", logoutTab);
 
         response.setContentType("text/html; charset=UTF-8");
         response.getWriter().write(html);
