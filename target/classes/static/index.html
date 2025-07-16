@@ -1,22 +1,36 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <link rel="icon" type="image/png" href="${favicon}">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lecteur Radio Rosemont</title>
+  <title>${radio.plainTitle}</title>
   <link rel="stylesheet" href="/css/app.css">
+  <style>${custom.css}</style> <!-- déplacé ici -->
 </head>
 <body>
-  <h1>📻 Radio Rosemont</h1>
-  <div style="text-align:center; margin-top: 1rem;">
-    <a href="/logout" class="button-logout">🔒 Se déconnecter</a>
+  <h1>${radio.title}</h1>
+  <p>${welcome.message}</p>
+  ${custom.html}
+
+  <div class="tabs">
+    <button class="tab-button active" data-tab="radio">🎧 Radio</button>
+    <button class="tab-button" data-tab="video">🎥 Vidéo</button>
+    <button class="tab-button" data-tab="logout">🚪 Déconnexion</button>
   </div>
-  <div id="player-container">Chargement du lecteur audio…</div>
-  <div id="metadata">Chargement des infos…</div>
-  <div id="video-container">
-    <div class="video-aspect">
-      <!-- Iframe vidéo ajouté ici par JS -->
-    </div>
+
+  <div id="tab-radio" class="tab-content active">
+    <div id="player-container">Chargement du lecteur audio…</div>
+    <div id="metadata">Chargement des infos…</div>
+  </div>
+
+  <div id="tab-video" class="tab-content">
+    <div id="video-container">Chargement du lecteur vidéo…</div>
+  </div>
+
+  <div id="tab-logout" class="tab-content" style="text-align:center;">
+    <p style="margin: 2rem;">Cliquez ci-dessous pour vous déconnecter.</p>
+    <a href="/logout" class="button-logout">🔒 Se déconnecter</a>
   </div>
 
   <script>
@@ -32,22 +46,21 @@
       const audio = document.createElement("audio");
       audio.src = `${API_BASE}/radio?token=${encodeURIComponent(token)}`;
       audio.controls = true;
-      audio.autoplay = true;
-      audio.style.margin = "1.2rem auto 1.2rem auto";
+      audio.autoplay = false;
       document.getElementById("player-container").innerHTML = "";
       document.getElementById("player-container").appendChild(audio);
     }
 
     async function setupVideo(token) {
-    const iframe = document.createElement("iframe");
-    iframe.src = `${API_BASE}/owncast/embed/video?token=${encodeURIComponent(token)}`;
-    iframe.width = "1920";
-    iframe.height = "1080";
-    iframe.allowFullscreen = true;
-    document.getElementById("video-container").innerHTML = "";
-    document.getElementById("video-container").appendChild(iframe);
-  }
-
+      const iframe = document.createElement("iframe");
+      iframe.src = `${API_BASE}/owncast/embed/video?token=${encodeURIComponent(token)}`;
+      iframe.width = "550";
+      iframe.height = "350";
+      iframe.allowFullscreen = true;
+      iframe.style.border = "none";
+      document.getElementById("video-container").innerHTML = "";
+      document.getElementById("video-container").appendChild(iframe);
+    }
 
     async function updateMetadata() {
       try {
@@ -75,6 +88,18 @@
         document.getElementById("video-container").innerText =
           "Erreur de lecture vidéo.";
       }
+
+      // Gestion des onglets
+      document.querySelectorAll(".tab-button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab-button").forEach(b => b.classList.remove("active"));
+          document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+
+          btn.classList.add("active");
+          const target = document.getElementById(`tab-${btn.dataset.tab}`);
+          if (target) target.classList.add("active");
+        });
+      });
     });
   </script>
 </body>

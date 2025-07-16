@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap');
 
 :root {
   --background: linear-gradient(135deg, #181922ee 40%, #25283bcc 100%);
@@ -10,7 +10,7 @@
 body {
   min-height: 100vh;
   margin: 0;
-  font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+  font-family: 'Inconsolata', monospace;
   background:
     linear-gradient(135deg, #181922ee 40%, #25283bcc 100%),
     url('/background.png') center center / cover no-repeat;
@@ -21,7 +21,9 @@ body {
   justify-content: flex-start;
   overflow-x: hidden;
 }
-
+p {
+  text-align: center;
+}
 h1 {
   font-weight: 900;
   letter-spacing: -1px;
@@ -39,6 +41,7 @@ h1 {
   padding: 0.7em 1.3em;
   font-size: 1.08rem;
   font-weight: bold;
+  font-family: 'Inconsolata', monospace;
   text-decoration: none;
   margin-bottom: 1.1em;
   box-shadow: 0 2px 8px 0 rgba(229,57,53,0.13);
@@ -71,12 +74,11 @@ audio {
 }
 
 #video-container {
-  /*max-width: 720px;*/
   margin: 1.1rem auto 0.5rem auto;
   text-align: center;
 }
+
 #video-container iframe {
-  /*width: 100%;*/
   width: 550px;
   height: 350px;
   border-radius: 13px;
@@ -85,9 +87,58 @@ audio {
   box-shadow: 0 2px 20px 0 rgba(40,0,0,0.10);
   display: block;
 }
-@media (max-width: 900px) {
-  #video-container iframe {
-    height: calc(56.25vw); /* 16:9 ratio sur petits écrans */
-    max-width: 100vw;
+
+@media (max-width: 1024px) {
+  .tab-button {
+    padding: 2em 3em;
+    font-size: 2rem;
+    border-radius: 20px;
+    width: 90vw;
   }
+
+  .button-logout {
+    padding: 2em 3em;
+    font-size: 2rem;
+    border-radius: 20px;
+    width: 90vw;
+  }
+
+  .tabs {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+  }
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  gap: 1rem;
+}
+
+.tab-button {
+  background: transparent;
+  color: var(--text);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  padding: 0.6em 1.4em;
+  font-size: 1.05rem;
+  font-weight: bold;
+  font-family: 'Inconsolata', monospace;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.tab-button.active, .tab-button:hover {
+  background: var(--accent);
+  transform: scale(1.04);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
 }

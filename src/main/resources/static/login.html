@@ -2,15 +2,14 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Connexion | Radio Rosemont</title>
+  <link rel="icon" type="image/png" href="${favicon}">
+
+  <title>${login.title}</title>
   <link rel="stylesheet" href="/css/login.css">
 </head>
 <body>
   <div class="login-container">
-    <h1>
-      <span class="accent">Radio</span>Rosemont
-      <span class="logo-antenna">📡</span>
-    </h1>
+<h1>${radio.title}<span class="logo-antenna">📡</span></h1>
     <form method="post" action="/login">
       <input type="text" name="username" placeholder="Nom d'utilisateur" required autofocus>
       <input type="password" name="password" placeholder="Mot de passe" required>

@@ -103,28 +103,38 @@ public class Security_Config {
 
     // === Règles de sécurité ===
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())  // Ajoute ça pour voir si c’est le CSRF qui bloque
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/token", "/favicon.ico", "/css/**", "/js/**", "/login.html").permitAll()
-                .requestMatchers("/dashboard.html").hasRole("ADMIN")
-                .requestMatchers("/index.html").authenticated()
-                .anyRequest().permitAll()
-            )
-            .formLogin(login -> login
-            .loginPage("/login.html")
-            .loginProcessingUrl("/login")
-            .defaultSuccessUrl("/index.html", true)
-            .failureUrl("/login.html?error")
-            .permitAll()
+public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager, IceWatchConfig config) throws Exception {
+    http.csrf(csrf -> csrf.disable());
+
+    if (config.isDisableLogin()) {
+        // Mode public : accès libre à /index
+        http.authorizeHttpRequests(auth -> auth
+            .requestMatchers("/auth/token", "/favicon.ico", "/css/**", "/js/**", "/login.html", "/index", "/").permitAll()
+            .requestMatchers("/dashboard").hasRole("ADMIN")
+            .anyRequest().permitAll()
+        );
+    } else {
+        // Mode sécurisé : /index protégé
+        http.authorizeHttpRequests(auth -> auth
+            .requestMatchers("/auth/token", "/favicon.ico", "/css/**", "/js/**", "/login.html").permitAll()
+            .requestMatchers("/dashboard").hasRole("ADMIN")
+            .requestMatchers("/index", "/").authenticated()
+            .anyRequest().permitAll()
         )
-
-            .logout(logout -> logout.permitAll())
-            .authenticationManager(authManager)
-            .headers(headers -> headers.frameOptions().disable());
-
-        return http.build();
+        .formLogin(login -> login
+            .loginPage("/login")
+            .loginProcessingUrl("/login")
+            .defaultSuccessUrl("/index", true)
+            .failureUrl("/login?error")
+            .permitAll()
+        );
     }
+
+    http.logout(logout -> logout.permitAll())
+        .authenticationManager(authManager)
+        .headers(headers -> headers.frameOptions().disable());
+
+    return http.build();
+}
 
 }

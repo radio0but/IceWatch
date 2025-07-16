@@ -7,3 +7,4 @@ com/radioip/backend/controller/StreamController.class
 com/radioip/backend/config/Security_Config.class
 com/radioip/backend/controller/MetadataController.class
 com/radioip/backend/controller/OwncastProxyController.class
+com/radioip/backend/controller/StaticPageController.class
