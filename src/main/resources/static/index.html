@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${radio.plainTitle}</title>
   <link rel="stylesheet" href="/css/app.css">
-  <style>${custom.css}</style> <!-- déplacé ici -->
 </head>
 <body>
   <h1>${radio.title}</h1>
@@ -22,6 +21,13 @@
   <div id="tab-radio" class="tab-content active">
     <div id="player-container">Chargement du lecteur audio…</div>
     <div id="metadata">Chargement des infos…</div>
+    <div id="carousel-wrapper" style="display:none">
+      <div id="carousel">
+        <div class="carousel-inner" id="carousel-inner"></div>
+        <button id="prev-button" class="carousel-button">⮜</button>
+        <button id="next-button" class="carousel-button">⮞</button>
+      </div>
+    </div>
   </div>
 
   <div id="tab-video" class="tab-content">
@@ -30,75 +36,170 @@
 
   ${logout.tab}
 
+<script>
+let currentSlide = 0;
+let isAutoScrolling = false; // Flag pour savoir si le défilement auto est activé
+let scrollInterval; // Pour contrôler l'intervalle de défilement automatique
 
-  <script>
-    const API_BASE = "https://radio.boogiepit.com";
+const API_BASE = "https://radio.boogiepit.com";
 
-    async function fetchToken() {
-      const res = await fetch(`${API_BASE}/auth/token`);
-      const { token } = await res.json();
-      return token;
-    }
+// Fonction pour récupérer le token
+async function fetchToken() {
+  const res = await fetch(`${API_BASE}/auth/token`);
+  const { token } = await res.json();
+  return token;
+}
 
-    async function setupAudio(token) {
-      const audio = document.createElement("audio");
-      audio.src = `${API_BASE}/radio?token=${encodeURIComponent(token)}`;
-      audio.controls = true;
-      audio.autoplay = false;
-      document.getElementById("player-container").innerHTML = "";
-      document.getElementById("player-container").appendChild(audio);
-    }
+// Fonction pour configurer l'audio
+async function setupAudio(token) {
+  const audio = document.createElement("audio");
+  audio.src = `${API_BASE}/radio?token=${encodeURIComponent(token)}`;
+  audio.controls = true;
+  audio.autoplay = false;
+  document.getElementById("player-container").innerHTML = "";
+  document.getElementById("player-container").appendChild(audio);
+}
 
-    async function setupVideo(token) {
-      const iframe = document.createElement("iframe");
-      iframe.src = `${API_BASE}/owncast/embed/video?token=${encodeURIComponent(token)}`;
-      iframe.width = "550";
-      iframe.height = "350";
-      iframe.allowFullscreen = true;
-      iframe.style.border = "none";
-      document.getElementById("video-container").innerHTML = "";
-      document.getElementById("video-container").appendChild(iframe);
-    }
+// Fonction pour configurer la vidéo
+async function setupVideo(token) {
+  const iframe = document.createElement("iframe");
+  iframe.src = `${API_BASE}/owncast/embed/video?token=${encodeURIComponent(token)}`;
+  iframe.width = "550";
+  iframe.height = "350";
+  iframe.allowFullscreen = true;
+  iframe.style.border = "none";
+  document.getElementById("video-container").innerHTML = "";
+  document.getElementById("video-container").appendChild(iframe);
+}
 
-    async function updateMetadata() {
-      try {
-        const res = await fetch(`${API_BASE}/radio/metadata`);
-        const { title } = await res.json();
-        document.getElementById("metadata").innerText =
-          title ? `🎶 En cours : ${title}` : "Pas de métadonnées.";
-      } catch {
-        document.getElementById("metadata").innerText =
-          "Erreur de chargement des métadonnées.";
-      }
-    }
+// Fonction de défilement manuel des slides (avec les flèches)
+function scrollCarousel(dir) {
+  const container = document.getElementById("carousel-inner");
+  const total = container.children.length;
+  const cardWidth = container.children[0].offsetWidth; // Largeur d'une carte
+  currentSlide = (currentSlide + dir + total) % total;
 
-    window.addEventListener("DOMContentLoaded", async () => {
-      try {
-        const token = await fetchToken();
-        await setupAudio(token);
-        await setupVideo(token);
-        updateMetadata();
-        setInterval(updateMetadata, 15000);
-      } catch (err) {
-        console.error("Erreur d'initialisation :", err);
-        document.getElementById("player-container").innerText =
-          "Erreur de lecture audio.";
-        document.getElementById("video-container").innerText =
-          "Erreur de lecture vidéo.";
-      }
+  container.style.transition = "transform 0.5s ease-in-out";  // Transition fluide
+  container.style.transform = `translateX(-${currentSlide * cardWidth}px)`;
 
-      // Gestion des onglets
-      document.querySelectorAll(".tab-button").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".tab-button").forEach(b => b.classList.remove("active"));
-          document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+  resetAutoScroll(); // Réinitialiser l'auto défilement lorsque l'utilisateur interagit
+}
 
-          btn.classList.add("active");
-          const target = document.getElementById(`tab-${btn.dataset.tab}`);
-          if (target) target.classList.add("active");
-        });
+// Fonction de défilement automatique
+function startAutoScroll() {
+  const container = document.getElementById("carousel-inner");
+  const total = container.children.length;
+  const cardWidth = container.children[0].offsetWidth; // Largeur d'une carte
+
+  function scrollContinuously() {
+    if (!isAutoScrolling) return; // Ne fait rien si l'utilisateur interagit
+
+    container.style.transition = "transform 0.5s ease-in-out"; // Transition fluide
+    currentSlide = (currentSlide + 1) % total;
+    container.style.transform = `translateX(-${currentSlide * cardWidth}px)`;
+  }
+
+  // Démarre le défilement automatique à chaque 5 secondes
+  scrollInterval = setInterval(scrollContinuously, 5000); // Intervalle de 5 secondes
+}
+
+// Fonction pour arrêter le défilement automatique
+function stopAutoScroll() {
+  clearInterval(scrollInterval);
+  isAutoScrolling = false;
+}
+
+// Fonction pour démarrer l'auto-scroll 5 secondes après le chargement
+function startAutoScrollAfterDelay() {
+  setTimeout(() => {
+    isAutoScrolling = true;
+    startAutoScroll();
+  }, 5000); // Démarre après 5 secondes
+}
+
+// Fonction pour mettre à jour les métadonnées
+async function updateMetadata() {
+  try {
+    const res = await fetch(`${API_BASE}/radio/metadata/enriched`);
+    const data = await res.json();
+    const title = data.title || "Inconnu";
+    const artist = data.artist || "";
+
+    document.getElementById("metadata").innerText = artist
+      ? `🎶 ${artist} – ${title}`
+      : `🎶 En cours : ${title}`;
+
+    const allAlbums = data.allAlbums;
+    if (Array.isArray(allAlbums) && allAlbums.length > 0) {
+      const container = document.getElementById("carousel-inner");
+      container.innerHTML = "";
+
+      // Pour chaque album, on crée et ajoute une carte
+      allAlbums.forEach(a => {
+        const albumCard = document.createElement('div');
+        albumCard.classList.add('album-card');
+        
+        // On crée un contenu pour la carte d'album
+        albumCard.innerHTML = `
+          <h2>Parution</h2>
+          <p>Les informations proviennent de MusicBrainz.</p>
+          <p><strong>${a.date || 'Date inconnue'}</strong></p>
+          <p>${a.album}</p>
+          <img src="${a.cover}" onerror="this.src='/album.png'" alt="Jaquette">
+        `;
+
+        // On ajoute la carte d'album au conteneur du carrousel
+        container.appendChild(albumCard);
       });
+
+      document.getElementById("carousel-wrapper").style.display = "flex";
+    } else {
+      document.getElementById("carousel-wrapper").style.display = "none";
+    }
+  } catch (err) {
+    document.getElementById("metadata").innerText = "Erreur de chargement des métadonnées.";
+    document.getElementById("carousel-wrapper").style.display = "none";
+  }
+}
+
+window.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const token = await fetchToken();
+    await setupAudio(token);
+    await setupVideo(token);
+    updateMetadata();
+    startAutoScrollAfterDelay(); // Démarre le défilement automatique après 5 secondes de délai
+  } catch (err) {
+    console.error("Erreur d'initialisation :", err);
+    document.getElementById("player-container").innerText =
+      "Erreur de lecture audio.";
+    document.getElementById("video-container").innerText =
+      "Erreur de lecture vidéo.";
+  }
+
+  // Gérer l'activation des onglets
+  document.querySelectorAll(".tab-button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab-button").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+      btn.classList.add("active");
+      const target = document.getElementById(`tab-${btn.dataset.tab}`);
+      if (target) target.classList.add("active");
     });
-  </script>
+  });
+
+  // Ajout des événements pour les flèches
+  document.getElementById("prev-button").addEventListener("click", () => {
+    scrollCarousel(-1);
+    stopAutoScroll(); // Arrêter l'auto défilement lors de l'interaction manuelle
+  });
+
+  document.getElementById("next-button").addEventListener("click", () => {
+    scrollCarousel(1);
+    stopAutoScroll(); // Arrêter l'auto défilement lors de l'interaction manuelle
+  });
+});
+</script>
+
 </body>
 </html>
