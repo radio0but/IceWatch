@@ -1,11 +1,12 @@
-com/radioip/backend/controller/AuthController.class
-com/radioip/backend/config/IceWatchConfig.class
-com/radioip/backend/config/CorsConfig.class
-com/radioip/backend/service/TokenService.class
-com/radioip/backend/service/MetadataService.class
 com/radioip/backend/RadioBackendApplication.class
 com/radioip/backend/controller/StreamController.class
 com/radioip/backend/config/Security_Config.class
 com/radioip/backend/controller/MetadataController.class
+com/radioip/backend/controller/AuthController.class
+com/radioip/backend/config/IceWatchConfig.class
+com/radioip/backend/config/CorsConfig.class
+com/radioip/backend/service/TokenService.class
+com/radioip/backend/service/ArtistImageService.class
+com/radioip/backend/service/MetadataService.class
 com/radioip/backend/controller/OwncastProxyController.class
 com/radioip/backend/controller/StaticPageController.class

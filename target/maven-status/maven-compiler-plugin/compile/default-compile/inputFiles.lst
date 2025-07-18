@@ -7,5 +7,6 @@
 /home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/controller/OwncastProxyController.java
 /home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/controller/StaticPageController.java
 /home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/controller/StreamController.java
+/home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/service/ArtistImageService.java
 /home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/service/MetadataService.java
 /home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/service/TokenService.java

@@ -11,8 +11,8 @@ body {
   min-height: 100vh;
   margin: 0;
   font-family: 'Inconsolata', monospace;
-  background:
-    linear-gradient(135deg, #181922ee 40%, #25283bcc 100%),
+  background: 
+    linear-gradient(135deg, rgba(24, 25, 34, 0.9) 40%, rgba(37, 40, 59, 0.2) 100%),
     url('/background.png') center center / cover no-repeat;
   color: var(--text);
   display: flex;
@@ -21,9 +21,27 @@ body {
   justify-content: flex-start;
   overflow-x: hidden;
 }
-
+#artist-image-container {
+  display: none; /* Masquer le conteneur d'image au départ */
+}
 p {
   text-align: center;
+  padding-right: 25px;
+  padding-left: 25px;
+}
+/* Carrousel */
+#carousel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-top: 1rem;
+  position: relative;
+  width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1rem;
+  
 }
 
 h1 {
@@ -72,7 +90,7 @@ audio {
   background: #21212b;
   box-shadow: 0 2px 20px 0 rgba(40,0,0,0.13);
   border: 2px solid #333a;
-  border-radius: 11px;
+  border-radius: 50px;
 }
 
 #video-container {
@@ -89,53 +107,6 @@ audio {
   box-shadow: 0 2px 20px 0 rgba(40,0,0,0.10);
   display: block;
 }
-
-@media (max-width: 1024px) {
-  /* Ajustement des boutons */
-  .tab-button, .button-logout {
-    padding: 2em 3em;
-    font-size: 2rem;
-    border-radius: 20px;
-    width: 90vw;
-  }
-
-  /* Ajustement des sections de tabulation */
-  .tabs {
-    flex-direction: column;
-    align-items: center;
-    gap: 1.2rem;
-  }
-
-  /* Ajustement de la boîte de métadonnées */
-  #metadata-box {
-    max-width: 100px;
-    padding: 1rem;
-  }
-
-  /* Ajustement du carrousel */
-  #carousel {
-    width: 60vw;  /* Réduire la largeur du carrousel */
-    height: 350px;
-    margin-top: 0.5rem;  /* Réduire l'espace sous le carrousel */
-    margin-bottom: 1rem;
-  }
-
-  .album-card {
-    padding: 0.3rem;
-  }
-
-  .carousel-button {
-    font-size: 1.2rem;
-    padding: 0.5rem;
-  }
-
-  /* Ajuster la position des flèches du carrousel */
-  #prev-button, #next-button {
-    top: 45%;  /* Plus proche du centre */
-    padding: 0.5rem 1rem;
-  }
-}
-
 .tabs {
   display: flex;
   justify-content: center;
@@ -191,25 +162,13 @@ audio {
   font-size: 0.95rem;
 }
 
-/* Carrousel */
-#carousel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  margin-top: 1rem;
-  position: relative;
-  width: 400px;
-  height: 450px;
-  margin-left: auto;
-  margin-right: auto;
-}
 
 .carousel-inner {
     display: flex;
     transition: transform 0.3s ease-in-out;
     width: 100%;
     height: fit-content;
+    border-radius: 25px;
 }
 
 .album-card {
@@ -250,4 +209,108 @@ audio {
 
 h2 {
     text-align: center;
+}
+@media (max-width: 1024px) {
+  /* Ajustement des boutons */
+  .tab-button, .button-logout {
+    /* padding: 2em 3em; */
+    font-size: 2rem;
+    border-radius: 20px;
+    width: 90vw;
+  } 
+
+  #player-container, #metadata {
+  margin: 0.7rem auto 0.5rem auto;
+  max-width: 300px;
+  text-align: center;
+}
+  audio
+  {
+      display: block !important;
+      min-width: 260px;
+      width: 100% !important;
+      min-height: 38px;
+      margin: 1.5rem auto 1rem auto;
+      z-index: 9;
+      background: #21212b;
+      box-shadow: 0 2px 20px 0 rgba(40, 0, 0, 0.13);
+      border: 2px solid #333a;
+      border-radius: 50px;
+  }
+  .carousel-button {
+  background: none;
+  border: 1px solid white; 
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  /* padding: 0.25rem 0.5rem; */
+  border-radius: 6px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(376%);
+  z-index: 10;
+}
+#video-container iframe
+ {
+    width: 384px;
+    height: 283px;
+    border-radius: 13px;
+    border: none;
+    background: #1a1c22;
+    box-shadow: 0 2px 20px 0 rgba(40, 0, 0, 0.10);
+    display: block;
+}
+  .carousel-inner {
+    display: flex;
+    transition: transform 0.3s ease-in-out;
+    width: 300px;
+}
+
+/* Ajustement des sections de tabulation */
+  .tabs {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+  } 
+
+  /* Ajustement de la boîte de métadonnées */
+  #metadata-box {
+    max-width: 100px;
+    padding: 1rem;
+  }
+
+  /* Ajustement du carrousel */
+  #carousel {
+    width: 300px;  /* Réduire la largeur du carrousel */
+    margin-top: 0.5rem;  /* Réduire l'espace sous le carrousel */
+    margin-bottom: 1rem;
+    
+  }
+
+  .album-card {
+    padding: 0.3rem;
+  }
+
+  .carousel-button {
+    font-size: 1.2rem;
+    padding: 0.5rem;
+  }
+
+  /* Ajuster la position des flèches du carrousel */
+  #prev-button, #next-button {
+    top: 45%;  /* Plus proche du centre */
+    padding: 0.5rem 1rem;
+  }
+}
+
+#metadata {
+  transition: opacity 0.5s ease-in-out;
+}
+
+.fade-out {
+  opacity: 0;
+}
+
+.fade-in {
+  opacity: 1;
 }

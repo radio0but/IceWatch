@@ -76,6 +76,16 @@ public class MetadataService {
                     System.out.println("Titre vide ou invalide pour l'album");
                 }
 
+                // Extraction de la première date de sortie
+                int firstReleaseDateStart = json.indexOf("\"first-release-date\":\"", titleEnd);
+                if (firstReleaseDateStart != -1) {
+                    firstReleaseDateStart += 21;  // Length of the string "\"first-release-date\":\""
+                    int firstReleaseDateEnd = json.indexOf("\"", firstReleaseDateStart);
+                    if (firstReleaseDateEnd > firstReleaseDateStart) {
+                        album.put("firstReleaseDate", json.substring(firstReleaseDateStart, firstReleaseDateEnd));
+                    }
+                }
+
                 // Extraction de la date de sortie
                 int dateStart = json.indexOf("\"date\":\"", titleEnd);
                 if (dateStart != -1) {
@@ -106,11 +116,12 @@ public class MetadataService {
                 albums.sort(Comparator.comparing(a -> a.getOrDefault("date", "9999")));
 
                 // Inverser la liste pour afficher le dernier album en premier
-                Collections.reverse(albums);
+                //Collections.reverse(albums);
 
                 enriched.put("album", albums.get(0).get("album"));
                 enriched.put("date", albums.get(0).get("date"));
                 enriched.put("cover", albums.get(0).get("cover"));
+                enriched.put("firstReleaseDate", albums.get(0).get("firstReleaseDate"));
                 enriched.put("allAlbums", albums);
             }
 

@@ -6,7 +6,7 @@ import com.radioip.backend.service.MetadataService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+import com.radioip.backend.service.ArtistImageService;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -72,6 +72,15 @@ public class MetadataController {
                     enriched.put("cover", enriched.get("cover"));
                     return enriched;
                 });
+    }
+    @Autowired
+    private ArtistImageService artistImageService;
+
+    // Endpoint pour récupérer l'image de l'artiste
+    @GetMapping("/artist/image")
+    public String getArtistImage(@RequestParam String artistName) {
+        Optional<String> imageUrl = artistImageService.getArtistImage(artistName);
+        return imageUrl.orElse("/static/default-artist-image.png");  // URL de fallback si aucune image n'est trouvée
     }
 
 }
