@@ -359,7 +359,11 @@ sudo pacman -S --noconfirm pro-audio
 # === Réinstallation de PipeWire-JACK ===
 info "Réinstallation de pipewire-jack (après pro-audio)..."
 sudo pacman -S --noconfirm pipewire-jack pipewire-alsa pipewire-pulse wireplumber
-
+if pacman -Q jack2 &>/dev/null; then
+  warn "jack2 est encore installé – pipewire-jack n’a peut-être pas remplacé correctement !"
+else
+  info "jack2 a bien été remplacé par pipewire-jack ✅"
+fi
 # === Installation des applications complémentaires (via pacman) ===
 info "Installation des logiciels complémentaires (via pacman)..."
 

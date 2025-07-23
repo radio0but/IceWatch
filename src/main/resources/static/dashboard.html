@@ -3,50 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <title>Tableau de bord - Administration Radio</title>
-    <style>
-        body { background: #0e0e0e; color: #eee; font-family: sans-serif; padding: 2rem; }
-        h1 { color: #ff3366; text-align: center; }
-        table { width: 100%; border-collapse: collapse; margin-top: 2rem; }
-        th, td { border: 1px solid #888; padding: 0.5rem; text-align: left; }
-        th { background: #222; }
-        form { margin-top: 2rem; max-width: 400px; margin-left: auto; margin-right: auto; }
-        input, select, button { width: 100%; margin-bottom: 1rem; padding: 0.5rem; background: #222; color: #fff; border: 1px solid #555; }
-        button { background: #ff3366; border: none; cursor: pointer; }
-        button:hover { background: #ff5577; }
-    </style>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>${custom.css}</style>
 </head>
 <body>
-<h1>Gestion des utilisateurs</h1>
+<h1>Tableau de bord - Administration Radio</h1>
 
-<table>
-    <thead>
-        <tr>
-            <th>Nom d'utilisateur</th>
-            <th>Rôles</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>admin</td>
-            <td>ADMIN, USER</td>
-        </tr>
-        <tr>
-            <td>enseignant</td>
-            <td>USER</td>
-        </tr>
-    </tbody>
-</table>
+<div class="tabs">
+    <button class="tab-button active" data-tab="slots">📅 Créneaux</button>
+    <button class="tab-button" data-tab="users">👥 Utilisateurs</button>
+    <button class="tab-button" data-tab="settings">⚙️ Paramètres</button>
+    <button class="tab-button" data-tab="restart">🔄 Redémarrer</button>
+</div>
+<!-- Onglet Utilisateurs -->
+<div id="tab-users" class="tab-content active">
+    <h2>Gestion des utilisateurs</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nom d'utilisateur</th>
+                <th>Rôles</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="user-list">
+            <!-- Rempli dynamiquement -->
+        </tbody>
+    </table>
 
-<form th:action="@{/admin/create}" method="post">
-    <h2>Créer un nouvel utilisateur</h2>
-    <input type="text" name="username" placeholder="Nom d'utilisateur" required />
-    <input type="password" name="password" placeholder="Mot de passe" required />
-    <select name="role">
-        <option value="USER">Utilisateur</option>
-        <option value="ADMIN">Administrateur</option>
-    </select>
-    <button type="submit">Créer</button>
-</form>
+    <form action="/admin/create" method="post">
+        <h3>Créer un nouvel utilisateur</h3>
+        <input type="text" name="username" placeholder="Nom d'utilisateur" required />
+        <input type="password" name="password" placeholder="Mot de passe" required />
+        <select name="role">
+            <option value="USER">Utilisateur</option>
+            <option value="ADMIN">Administrateur</option>
+        </select>
+        <button type="submit">Créer</button>
+    </form>
+</div>
 
+<!-- Onglet Paramètres -->
+<div id="tab-settings" class="tab-content">
+    <h2>Personnaliser</h2>
+<p>
+  <strong>Instructions :</strong><br>
+  Avant de modifier les paramètres :
+  <ul style="margin-top:0;">
+    <li><strong>1.</strong> Cliquez sur <strong>♻️ Réinitialiser Apparence</strong> pour repartir d’une configuration propre.</li>
+    <li><strong>2.</strong> Si vous aviez une configuration existante, copiez-la avant et recoller les sections utiles après la réinitialisation.</li>
+    <li><strong>3.</strong> Modifiez les paramètres souhaités, puis cliquez sur <strong>💾 Enregistrer</strong>.</li>
+    <li><strong>4.</strong> <span style="color:red;">Redémarrez IceWatch</span> via l’onglet <strong>🔄 Redémarrer</strong> pour appliquer les changements.</li>
+  </ul>
+  Les modifications ne seront prises en compte qu’après le redémarrage du service IceWatch.
+</p>
+
+
+<details style="margin-bottom:1rem;">
+  <summary style="cursor:pointer; font-weight:bold;">🎨 Paramètres d'apparence disponibles (cliquez pour afficher)</summary>
+  <pre style="background:#eee; padding:1rem; overflow:auto; font-size:0.9rem; border-radius:6px;">
+# Titre HTML avec styles (affiché en haut)
+appearance.radio-title=&lt;span style='color:#e53935; font-weight:bold;'&gt;Radio&lt;/span&gt;Rosemont
+
+# Message d'accueil (HTML autorisé)
+appearance.welcome-message=&lt;p style='text-align:center; font-size:1.1rem;'&gt;Bienvenue...&lt;/p&gt;
+
+# Titre de la page de connexion (onglet navigateur)
+appearance.login-title=Connexion | Radio Rosemont
+
+# CSS personnalisé injecté
+appearance.custom-css=body { background: black; }
+
+# Bloc HTML personnalisé (ajouté sous le message d’accueil)
+appearance.custom-html=&lt;div&gt;Contenu personnalisé ici&lt;/div&gt;
+
+# Titre brut (sans HTML) pour métadonnées
+appearance.radio-plain-title=Radio Rosemont
+
+# Favicon (chemin vers image .ico ou .png)
+appearance.favicon=/favicon.png
+  </pre>
+</details>
+
+    <textarea id="properties-editor" rows="15" style="width:100%;"></textarea>
+    <button onclick="saveProperties()">💾 Enregistrer</button>
+    <button onclick="resetAppearance()" class="danger">♻️ Réinitialiser Apparence</button>
+
+</div>
+<!-- Onglet Créneaux -->
+<!-- Onglet Créneaux -->
+<div id="tab-slots" class="tab-content">
+    <h2>Planning des créneaux</h2>
+    <div class="legend">
+        <span>📻 = Radio</span>
+        <span>📺 = Vidéo</span>
+        <span class="status-live">🔴 En direct</span>
+        <span class="status-auto">⚙️ Automatique</span>
+        <span class="status-empty">⚪ Vide</span>
+    </div>
+    <div class="schedule-wrapper">
+  <div id="schedule-grid">
+      <!-- La grille sera générée en JS -->
+  </div>
+</div>
+</div>
+
+<!-- Onglet Redémarrage -->
+<div id="tab-restart" class="tab-content">
+    <h2>Redémarrer IceWatch</h2>
+    <p>Utilisez ce bouton pour redémarrer le service <strong>IceWatch</strong>.</p>
+    <button onclick="restartIceWatch()" class="danger">🚨 Redémarrer maintenant</button>
+</div>
+
+<script src="/js/dashboard.js"></script>
 </body>
 </html>

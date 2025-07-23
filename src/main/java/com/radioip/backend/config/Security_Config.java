@@ -1,30 +1,33 @@
 package com.radioip.backend.config;
 
+import com.radioip.backend.service.LocalUserDetailsService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
-import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
-import org.springframework.security.ldap.authentication.BindAuthenticator;
-import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator;
-import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
-import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
+import org.springframework.security.ldap.authentication.BindAuthenticator;
+import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
+import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+import java.io.IOException;
 import java.util.*;
 
 @Configuration
+@EnableMethodSecurity
 public class Security_Config {
 
     @Value("${spring.ldap.urls}")
@@ -41,53 +44,34 @@ public class Security_Config {
         return new BCryptPasswordEncoder();
     }
 
-    // === Utilisateurs locaux ===
-    @Bean
-    public InMemoryUserDetailsManager inMemoryUserDetailsService(PasswordEncoder encoder, IceWatchConfig config) {
-        return new InMemoryUserDetailsManager(
-            User.withUsername("admin")
-                .password(encoder.encode(config.getAdminPassword()))
-                .roles("ADMIN", "USER")
-                .build(),
-            User.withUsername("enseignant")
-                .password(encoder.encode(config.getEnseignantPassword()))
-                .roles("USER")
-                .build()
-        );
-    }
-    // === Contexte LDAP ===
     @Bean
     public DefaultSpringSecurityContextSource contextSource() {
         return new DefaultSpringSecurityContextSource(ldapUrl + "/" + ldapBase);
     }
 
-    // === Mapper : ROLE_USER à tout LDAP membre d'au moins un groupe ===
     @Bean
     public GrantedAuthoritiesMapper ldapAuthoritiesMapper() {
-        return (authorities) -> {
+        return authorities -> {
             if (authorities != null && !authorities.isEmpty()) {
                 Set<GrantedAuthority> mapped = new HashSet<>();
                 mapped.add(() -> "ROLE_USER");
                 return mapped;
             }
-            // Pas de groupe → login refusé
             return Collections.emptySet();
         };
     }
 
-    // === Authentification combinée LDAP + mémoire ===
     @Bean
     public AuthenticationManager authenticationManager(
-            InMemoryUserDetailsManager memoryAuth,
+            LocalUserDetailsService userService,
+            PasswordEncoder encoder,
             DefaultSpringSecurityContextSource contextSource,
             GrantedAuthoritiesMapper ldapAuthoritiesMapper
-    ) throws Exception {
-        // Local
+    ) {
         DaoAuthenticationProvider daoProvider = new DaoAuthenticationProvider();
-        daoProvider.setUserDetailsService(memoryAuth);
-        daoProvider.setPasswordEncoder(passwordEncoder());
+        daoProvider.setUserDetailsService(userService);
+        daoProvider.setPasswordEncoder(encoder);
 
-        // LDAP
         BindAuthenticator authenticator = new BindAuthenticator(contextSource);
         authenticator.setUserDnPatterns(new String[]{userDnPattern});
 
@@ -98,43 +82,64 @@ public class Security_Config {
         LdapAuthenticationProvider ldapProvider = new LdapAuthenticationProvider(authenticator, authoritiesPopulator);
         ldapProvider.setAuthoritiesMapper(ldapAuthoritiesMapper);
 
-        return new ProviderManager(Arrays.asList(daoProvider, ldapProvider));
+        return new ProviderManager(List.of(daoProvider, ldapProvider));
     }
 
-    // === Règles de sécurité ===
     @Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager, IceWatchConfig config) throws Exception {
-    http.csrf(csrf -> csrf.disable());
+    public AuthenticationSuccessHandler successHandler(IceWatchConfig config) {
+        return (HttpServletRequest request, HttpServletResponse response, Authentication auth) -> {
+            boolean isAdmin = auth.getAuthorities().stream()
+                    .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
 
-    if (config.isDisableLogin()) {
-        // Mode public : accès libre à /index
-        http.authorizeHttpRequests(auth -> auth
-            .requestMatchers("/auth/token", "/favicon.ico", "/css/**", "/js/**", "/login.html", "/index", "/").permitAll()
-            .requestMatchers("/dashboard").hasRole("ADMIN")
-            .anyRequest().permitAll()
-        );
-    } else {
-        // Mode sécurisé : /index protégé
-        http.authorizeHttpRequests(auth -> auth
-            .requestMatchers("/auth/token", "/favicon.ico", "/css/**", "/js/**", "/login.html").permitAll()
-            .requestMatchers("/dashboard").hasRole("ADMIN")
-            .requestMatchers("/index", "/").authenticated()
-            .anyRequest().permitAll()
-        )
-        .formLogin(login -> login
-            .loginPage("/login")
-            .loginProcessingUrl("/login")
-            .defaultSuccessUrl("/index", true)
-            .failureUrl("/login?error")
-            .permitAll()
-        );
+            if (config.isDisableLogin() && isAdmin) {
+                response.sendRedirect("/dashboard");
+            } else {
+                response.sendRedirect("/index");
+            }
+        };
     }
 
-    http.logout(logout -> logout.permitAll())
-        .authenticationManager(authManager)
-        .headers(headers -> headers.frameOptions().disable());
+    @Bean
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            AuthenticationManager authManager,
+            IceWatchConfig config
+    ) throws Exception {
 
-    return http.build();
-}
+        http.csrf(csrf -> csrf.disable());
 
+        http.authorizeHttpRequests(auth -> {
+            auth
+                // 🔓 Publics (toujours)
+                .requestMatchers("/auth/token", "/favicon.ico", "/css/**", "/js/**", "/login.html", "/login").permitAll();
+
+            if (config.isDisableLogin()) {
+                // 🟢 Accès libre à index, mais dashboard nécessite login
+                auth
+                    .requestMatchers("/", "/index").permitAll()
+                    .requestMatchers("/dashboard").authenticated()
+                    .anyRequest().permitAll();
+            } else {
+                // 🔐 Index et dashboard nécessitent login
+                auth
+                    .requestMatchers("/dashboard").hasRole("ADMIN")
+                    .requestMatchers("/", "/index").authenticated()
+                    .anyRequest().permitAll();
+            }
+        });
+
+        http.formLogin(login -> login
+                .loginPage("/login")
+                .loginProcessingUrl("/login") // 🔐 nécessaire pour POST
+                .successHandler(successHandler(config))
+                .failureUrl("/login?error")
+                .permitAll()
+        );
+
+        http.logout(logout -> logout.permitAll())
+            .authenticationManager(authManager)
+            .headers(headers -> headers.frameOptions().disable());
+
+        return http.build();
+    }
 }
