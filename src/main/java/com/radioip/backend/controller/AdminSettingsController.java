@@ -8,6 +8,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Map;
+
+
 
 @RestController
 @RequestMapping("/admin/settings")
@@ -52,6 +55,71 @@ public class AdminSettingsController {
                     .body("Erreur d’écriture : " + e.getMessage());
         }
     }
+        @PostMapping("/admin/settings/restart-video-scheduler")
+    public ResponseEntity<Void> restartVideoScheduler() {
+        try {
+            ProcessBuilder pb = new ProcessBuilder("sudo", "systemctl", "restart", "video-scheduler.service");
+            pb.start().waitFor();
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @PostMapping("/admin/settings/restart-radio-scheduler")
+    public ResponseEntity<Void> restartRadioScheduler() {
+        try {
+            ProcessBuilder pb = new ProcessBuilder("sudo", "systemctl", "restart", "radio-scheduler.service");
+            pb.start().waitFor();
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+    @GetMapping("/admin/settings/scheduler-status")
+public Map<String, String> getSchedulerStatus() {
+    return Map.of(
+        "video", checkService("video-scheduler.service"),
+        "radio", checkService("radio-scheduler.service")
+    );
+}
+
+private String checkService(String serviceName) {
+    try {
+        ProcessBuilder pb = new ProcessBuilder("systemctl", "is-active", serviceName);
+        Process process = pb.start();
+        process.waitFor();
+        String output = new String(process.getInputStream().readAllBytes()).trim();
+        return output; // active, inactive, failed, etc.
+    } catch (Exception e) {
+        return "unknown";
+    }
+}
+
+
+@GetMapping("/logs/video-scheduler")
+public ResponseEntity<String> getVideoSchedulerLogs() {
+    return getServiceLogs("video-scheduler.service");
+}
+
+@GetMapping("/logs/radio-scheduler")
+public ResponseEntity<String> getRadioSchedulerLogs() {
+    return getServiceLogs("radio-scheduler.service");
+}
+
+private ResponseEntity<String> getServiceLogs(String serviceName) {
+    try {
+        ProcessBuilder pb = new ProcessBuilder("sudo","journalctl", "-u", serviceName, "--no-pager", "-n", "50");
+        Process p = pb.start();
+        p.waitFor();
+        String output = new String(p.getInputStream().readAllBytes());
+        return ResponseEntity.ok(output);
+    } catch (Exception e) {
+        return ResponseEntity.internalServerError().body("Erreur journalctl : " + e.getMessage());
+    }
+}
+
+
     @PostMapping("/reset")
     public ResponseEntity<String> resetAppearance() {
         try {

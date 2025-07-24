@@ -110,10 +110,32 @@ appearance.favicon=/favicon.png
 
 <!-- Onglet Redémarrage -->
 <div id="tab-restart" class="tab-content">
-    <h2>Redémarrer IceWatch</h2>
-    <p>Utilisez ce bouton pour redémarrer le service <strong>IceWatch</strong>.</p>
-    <button onclick="restartIceWatch()" class="danger">🚨 Redémarrer maintenant</button>
+    <h2>Redémarrer IceWatch & Schedulers</h2>
+    <p>Utilisez ces boutons pour redémarrer les services.</p>
+    <button onclick="restartIceWatch()" class="danger">🚨 Redémarrer IceWatch</button>
+    
+    <div style="margin-top: 1rem;">
+      <button onclick="restartVideoScheduler()" class="danger">
+        🎬 Redémarrer Vidéo Scheduler
+      </button>
+      <button onclick="restartRadioScheduler()" class="danger">
+        📻 Redémarrer Radio Scheduler
+      </button>
+      <h3 style="margin-top: 2rem;">🎬 Logs Vidéo Scheduler</h3>
+<button onclick="loadLog('video')">🔄 Actualiser</button>
+<textarea id="log-video" rows="12" readonly style="width:100%; margin-top:0.5rem;"></textarea>
+
+    </div>
+
+    <div style="margin-top: 0.5rem;">
+      <br>
+      <h3 style="margin-top: 2rem;">📻 Logs Radio Scheduler</h3>
+<button onclick="loadLog('radio')">🔄 Actualiser</button>
+<textarea id="log-radio" rows="12" readonly style="width:100%; margin-top:0.5rem;"></textarea>
+      
+    </div>
 </div>
+
 
 <script src="/js/dashboard.js"></script>
 </body>

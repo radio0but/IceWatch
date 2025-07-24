@@ -11,6 +11,11 @@ export NEEDRESTART_MODE=a
 # ––– si vous utilisez ucf pour les fichiers de config
 export UCF_FORCE_CONFFNEW=1
 
+info() {
+  echo -e "[INFO] $1"
+}
+
+
 # Handle uninstall
 if [[ "$1" == "--uninstall" ]]; then
     echo "🧹 Uninstalling IceWatch Stack..."
@@ -49,6 +54,16 @@ MASTER_TOKEN=$(openssl rand -base64 32 | tr -dc 'A-Za-z0-9' | head -c 48)
 
 # Update system
 apt update && apt upgrade -y
+
+echo "🐘 Installation de PostgreSQL + sudo..."
+apt install -y postgresql sudo
+
+echo "🛠️ Configuration PostgreSQL (user icewatch)..."
+sudo -u postgres psql <<EOF
+CREATE USER icewatch WITH PASSWORD '${LOCAL_ADMIN_PW}';
+ALTER USER icewatch CREATEDB;
+CREATE DATABASE icewatchdb OWNER icewatch;
+EOF
 
 # Install Icecast & Liquidsoap
 apt install -y icecast2 liquidsoap default-jre curl docker.io docker-compose
@@ -115,12 +130,13 @@ docker run -d --name owncast -p 8123:8080 -p 1935:1935 \
   gabekangas/owncast
 
 # IceWatch
-echo "📥 Downloading IceWatch..."
+echo "📥 Téléchargement IceWatch..."
 mkdir -p /opt/icewatch /etc/icewatch
 curl -L https://github.com/radio0but/IceWatch/releases/download/v0.0.1/IceWatch.jar \
   -o /opt/icewatch/icewatch.jar
 
 cat <<EOF > /etc/icewatch/application.properties
+# === IceWatch
 server.port=${ICEWATCH_PORT}
 icewatch.master-token=${MASTER_TOKEN}
 icewatch.allowed-domain=${ALLOWED_REFERER}
@@ -128,7 +144,17 @@ icewatch.owncast-url=http://localhost:8123
 icewatch.icecast-stream-url=http://localhost:8000/radio
 icewatch.admin-password=${LOCAL_ADMIN_PW}
 icewatch.enseignant-password=${LOCAL_ENSEIGNANT_PW}
+
+# === PostgreSQL
+spring.datasource.url=jdbc:postgresql://localhost:5432/icewatchdb
+spring.datasource.username=icewatch
+spring.datasource.password=${LOCAL_ADMIN_PW}
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.show-sql=true
 EOF
+
 echo
 read -p "Souhaitez-vous activer l’authentification LDAP maintenant ? (o/N): " ENABLE_LDAP
 ENABLE_LDAP=$(echo "$ENABLE_LDAP" | tr '[:upper:]' '[:lower:]')
@@ -185,6 +211,25 @@ systemctl daemon-reexec
 systemctl daemon-reload
 systemctl enable icewatch
 systemctl start icewatch
+
+
+echo "🔐 Ajout des permissions sudo pour icewatch (journalctl & restart services)..."
+cat <<EOF > /etc/sudoers.d/icewatch-restart
+icewatch ALL=(ALL) NOPASSWD: /bin/systemctl restart icewatch, \
+                             /bin/systemctl restart video-scheduler.service, \
+                             /bin/systemctl restart radio-scheduler.service
+
+icewatch ALL=(ALL) NOPASSWD: /bin/journalctl -u icewatch, \
+                             /bin/journalctl -u radio-scheduler.service, \
+                             /bin/journalctl -u video-scheduler.service
+
+icewatch ALL=(ALL) NOPASSWD: /bin/journalctl -u video-scheduler.service --no-pager -n 50
+icewatch ALL=(ALL) NOPASSWD: /bin/journalctl -u radio-scheduler.service --no-pager -n 50
+EOF
+
+chmod 440 /etc/sudoers.d/icewatch-restart
+
+visudo -cf /etc/sudoers.d/icewatch-restart
 
 
 # ────────────────

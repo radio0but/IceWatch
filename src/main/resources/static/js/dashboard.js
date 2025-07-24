@@ -1,7 +1,9 @@
 // === Point d'entrée ===
 window.addEventListener("DOMContentLoaded", () => {
-  setupTabs(); // active le premier onglet
+  setupTabs();         // active les onglets
+  updateSchedulerStatus();  // affiche les statuts ✅/🔴 des services au chargement
 });
+
 
 // === Gestion des onglets ===
 function setupTabs() {
@@ -139,10 +141,11 @@ async function loadSchedule() {
         else if (slot.audio === "auto" || slot.video === "auto") cssClass = "status-automation";
 
         grid.innerHTML += `
-  <div class="schedule-cell">
+  <div class="schedule-cell" onclick="showSlotContents('${jour}', '${heure}')">
     <div class="cell-radio ${getStatusClass(slot.audio)}">${slot.audio}</div>
     <div class="cell-video ${getStatusClass(slot.video)}">${slot.video}</div>
-  </div>`;
+  </div>
+`;
 
       }
     }
@@ -165,5 +168,130 @@ async function resetAppearance() {
     loadProperties(); // recharge la zone de texte
   } catch (err) {
     alert("Erreur de réinitialisation : " + err.message);
+  }
+}
+
+async function restartVideoScheduler() {
+  try {
+    await fetch("/admin/settings/restart-video-scheduler", { method: "POST" });
+    alert("🎬 Vidéo Scheduler redémarré !");
+  } catch (err) {
+    alert("Erreur redémarrage vidéo-scheduler : " + err.message);
+  }
+}
+
+async function restartRadioScheduler() {
+  try {
+    await fetch("/admin/settings/restart-radio-scheduler", { method: "POST" });
+    alert("📻 Radio Scheduler redémarré !");
+  } catch (err) {
+    alert("Erreur redémarrage radio-scheduler : " + err.message);
+  }
+}
+
+async function updateSchedulerStatus() {
+  try {
+    const res = await fetch("/admin/settings/scheduler-status");
+    const status = await res.json();
+
+    updateStatusLabel("status-video", status.video);
+    updateStatusLabel("status-radio", status.radio);
+  } catch (err) {
+    console.error("Erreur statut scheduler :", err);
+  }
+}
+
+function updateStatusLabel(elementId, state) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+
+  el.textContent = state === "active" ? "✅ Actif" :
+                   state === "inactive" ? "🔴 Inactif" :
+                   "❓ Inconnu";
+
+  el.className = "status-label status-" + (["active", "inactive"].includes(state) ? state : "unknown");
+}
+
+// Recharger le statut après chaque redémarrage :
+async function restartVideoScheduler() {
+  try {
+    await fetch("/admin/settings/restart-video-scheduler", { method: "POST" });
+    alert("🎬 Vidéo Scheduler redémarré !");
+    updateSchedulerStatus();
+  } catch (err) {
+    alert("Erreur redémarrage vidéo-scheduler : " + err.message);
+  }
+}
+
+async function restartRadioScheduler() {
+  try {
+    await fetch("/admin/settings/restart-radio-scheduler", { method: "POST" });
+    alert("📻 Radio Scheduler redémarré !");
+    updateSchedulerStatus();
+  } catch (err) {
+    alert("Erreur redémarrage radio-scheduler : " + err.message);
+  }
+}
+
+
+async function loadLog(type) {
+  const url = type === "video"
+    ? "/admin/settings/logs/video-scheduler"
+    : "/admin/settings/logs/radio-scheduler";
+
+  const textareaId = type === "video" ? "log-video" : "log-radio";
+
+  try {
+    const res = await fetch(url);
+    const text = await res.text();
+    document.getElementById(textareaId).value = text;
+  } catch (err) {
+    document.getElementById(textareaId).value = "Erreur lors du chargement des logs.";
+  }
+}
+function renderTree(tree, indent = 0) {
+  if (!tree || typeof tree !== 'object') return "";
+
+  const entries = Object.entries(tree);
+  if (entries.length === 0) return '&nbsp;'.repeat(indent * 4) + "(vide)";
+
+  return entries.map(([name, child]) => {
+    const spacing = '&nbsp;'.repeat(indent * 4);
+    if (child === null) {
+      return `${spacing}📄 ${name}`;
+    } else {
+      return `${spacing}📁 ${name}<br>` + renderTree(child, indent + 1);
+    }
+  }).join("<br>");
+}
+
+
+async function showSlotContents(jour, heure) {
+  try {
+    const res = await fetch(`/admin/schedule/contents?day=${encodeURIComponent(jour)}&hour=${encodeURIComponent(heure)}`);
+    const data = await res.json();
+
+    const audioTree = renderTree(data.audio);
+    const videoTree = renderTree(data.video);
+
+    const contenu = `
+      <strong>📂 Audio :</strong><br>${audioTree}<br><br>
+      <strong>📹 Vidéo :</strong><br>${videoTree}
+    `;
+
+    // 👉 Ouverture dans une popup HTML propre
+    const win = window.open("", "_blank", "width=600,height=500");
+    win.document.write(`
+      <html>
+        <head><title>${jour} ${heure}h</title></head>
+        <body style="font-family:monospace; background:#111; color:#eee; padding:1rem;">
+          <h2>📅 ${jour} à ${heure}h</h2>
+          ${contenu}
+        </body>
+      </html>
+    `);
+
+  } catch (err) {
+    alert("Erreur lors du chargement du contenu : " + err.message);
   }
 }

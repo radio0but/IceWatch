@@ -109,24 +109,26 @@ public class Security_Config {
         http.csrf(csrf -> csrf.disable());
 
         http.authorizeHttpRequests(auth -> {
-            auth
-                // 🔓 Publics (toujours)
-                .requestMatchers("/auth/token", "/favicon.ico", "/css/**", "/js/**", "/login.html", "/login").permitAll();
+    auth
+        // 🔓 Publics (toujours)
+        .requestMatchers("/auth/token", "/favicon.ico", "/css/**", "/js/**", "/login.html", "/login").permitAll()
+        // ⛔ Bloque tous les fichiers HTML (ex: dashboard.html, index.html direct)
+        .requestMatchers("/**.html").denyAll();
 
-            if (config.isDisableLogin()) {
-                // 🟢 Accès libre à index, mais dashboard nécessite login
-                auth
-                    .requestMatchers("/", "/index").permitAll()
-                    .requestMatchers("/dashboard").authenticated()
-                    .anyRequest().permitAll();
-            } else {
-                // 🔐 Index et dashboard nécessitent login
-                auth
-                    .requestMatchers("/dashboard").hasRole("ADMIN")
-                    .requestMatchers("/", "/index").authenticated()
-                    .anyRequest().permitAll();
-            }
-        });
+    if (config.isDisableLogin()) {
+        // 🟢 Accès libre à index, mais dashboard nécessite login
+        auth
+            .requestMatchers("/", "/index").permitAll()
+            .requestMatchers("/dashboard").authenticated()
+            .anyRequest().permitAll();
+    } else {
+        // 🔐 Accès restreint à tout
+        auth
+            .requestMatchers("/dashboard").hasRole("ADMIN")
+            .requestMatchers("/", "/index").authenticated()
+            .anyRequest().permitAll();
+    }
+});
 
         http.formLogin(login -> login
                 .loginPage("/login")
