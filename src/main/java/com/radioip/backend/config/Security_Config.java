@@ -30,13 +30,13 @@ import java.util.*;
 @EnableMethodSecurity
 public class Security_Config {
 
-    @Value("${spring.ldap.urls}")
+    @Value("${spring.ldap.urls:#{null}}")
     private String ldapUrl;
 
-    @Value("${spring.ldap.base}")
+    @Value("${spring.ldap.base:#{null}}")
     private String ldapBase;
 
-    @Value("${spring.ldap.user-dn-patterns}")
+    @Value("${spring.ldap.user-dn-patterns:#{null}}")
     private String userDnPattern;
 
     @Bean
@@ -45,8 +45,39 @@ public class Security_Config {
     }
 
     @Bean
-    public DefaultSpringSecurityContextSource contextSource() {
-        return new DefaultSpringSecurityContextSource(ldapUrl + "/" + ldapBase);
+    public AuthenticationManager authenticationManager(
+            LocalUserDetailsService userService,
+            PasswordEncoder encoder
+    ) {
+        DaoAuthenticationProvider daoProvider = new DaoAuthenticationProvider();
+        daoProvider.setUserDetailsService(userService);
+        daoProvider.setPasswordEncoder(encoder);
+
+        // Si LDAP est configuré
+        if (ldapUrl != null && !ldapUrl.isBlank() &&
+            ldapBase != null && !ldapBase.isBlank() &&
+            userDnPattern != null && !userDnPattern.isBlank()) {
+
+            DefaultSpringSecurityContextSource contextSource =
+                    new DefaultSpringSecurityContextSource(ldapUrl + "/" + ldapBase);
+            contextSource.afterPropertiesSet();
+
+            BindAuthenticator authenticator = new BindAuthenticator(contextSource);
+            authenticator.setUserDnPatterns(new String[]{userDnPattern});
+
+            DefaultLdapAuthoritiesPopulator authoritiesPopulator =
+                    new DefaultLdapAuthoritiesPopulator(contextSource, "ou=Groups");
+            authoritiesPopulator.setIgnorePartialResultException(true);
+
+            LdapAuthenticationProvider ldapProvider =
+                    new LdapAuthenticationProvider(authenticator, authoritiesPopulator);
+            ldapProvider.setAuthoritiesMapper(ldapAuthoritiesMapper());
+
+            return new ProviderManager(List.of(daoProvider, ldapProvider));
+        }
+
+        // Sinon → pas de LDAP
+        return new ProviderManager(List.of(daoProvider));
     }
 
     @Bean
@@ -59,30 +90,6 @@ public class Security_Config {
             }
             return Collections.emptySet();
         };
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(
-            LocalUserDetailsService userService,
-            PasswordEncoder encoder,
-            DefaultSpringSecurityContextSource contextSource,
-            GrantedAuthoritiesMapper ldapAuthoritiesMapper
-    ) {
-        DaoAuthenticationProvider daoProvider = new DaoAuthenticationProvider();
-        daoProvider.setUserDetailsService(userService);
-        daoProvider.setPasswordEncoder(encoder);
-
-        BindAuthenticator authenticator = new BindAuthenticator(contextSource);
-        authenticator.setUserDnPatterns(new String[]{userDnPattern});
-
-        DefaultLdapAuthoritiesPopulator authoritiesPopulator =
-                new DefaultLdapAuthoritiesPopulator(contextSource, "ou=Groups");
-        authoritiesPopulator.setIgnorePartialResultException(true);
-
-        LdapAuthenticationProvider ldapProvider = new LdapAuthenticationProvider(authenticator, authoritiesPopulator);
-        ldapProvider.setAuthoritiesMapper(ldapAuthoritiesMapper);
-
-        return new ProviderManager(List.of(daoProvider, ldapProvider));
     }
 
     @Bean
@@ -109,30 +116,26 @@ public class Security_Config {
         http.csrf(csrf -> csrf.disable());
 
         http.authorizeHttpRequests(auth -> {
-    auth
-        // 🔓 Publics (toujours)
-        .requestMatchers("/auth/token", "/favicon.ico", "/css/**", "/js/**", "/login.html", "/login").permitAll()
-        // ⛔ Bloque tous les fichiers HTML (ex: dashboard.html, index.html direct)
-        .requestMatchers("/**.html").denyAll();
+            auth
+                .requestMatchers("/auth/token", "/favicon.ico", "/css/**", "/js/**", "/login.html", "/login").permitAll()
+                .requestMatchers("/**.html").denyAll();
 
-    if (config.isDisableLogin()) {
-        // 🟢 Accès libre à index, mais dashboard nécessite login
-        auth
-            .requestMatchers("/", "/index").permitAll()
-            .requestMatchers("/dashboard").authenticated()
-            .anyRequest().permitAll();
-    } else {
-        // 🔐 Accès restreint à tout
-        auth
-            .requestMatchers("/dashboard").hasRole("ADMIN")
-            .requestMatchers("/", "/index").authenticated()
-            .anyRequest().permitAll();
-    }
-});
+            if (config.isDisableLogin()) {
+                auth
+                    .requestMatchers("/", "/index").permitAll()
+                    .requestMatchers("/dashboard").authenticated()
+                    .anyRequest().permitAll();
+            } else {
+                auth
+                    .requestMatchers("/dashboard").hasRole("ADMIN")
+                    .requestMatchers("/", "/index").authenticated()
+                    .anyRequest().permitAll();
+            }
+        });
 
         http.formLogin(login -> login
                 .loginPage("/login")
-                .loginProcessingUrl("/login") // 🔐 nécessaire pour POST
+                .loginProcessingUrl("/login")
                 .successHandler(successHandler(config))
                 .failureUrl("/login?error")
                 .permitAll()

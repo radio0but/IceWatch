@@ -1,8 +1,21 @@
 let currentSlide = 0;
 let isAutoScrolling = false;
 let scrollInterval;
-const API_BASE = "https://radio.boogiepit.com";
+
 let lastTitle = "";
+let API_BASE = location.origin;
+
+async function fetchApiBase() {
+  try {
+    const res = await fetch("/config/frontend");
+    if (res.ok) {
+      const data = await res.json();
+      if (data.apiBase) API_BASE = data.apiBase;
+    }
+  } catch (e) {
+    console.warn("Impossible de récupérer API_BASE, utilisation de", API_BASE);
+  }
+}
 
 async function fetchToken() {
   const res = await fetch(`${API_BASE}/auth/token`);
@@ -122,6 +135,7 @@ async function updateMetadata() {
 
 window.addEventListener("DOMContentLoaded", async () => {
   try {
+    await fetchApiBase(); // ← Ajouté ici
     const token = await fetchToken();
     await setupAudio(token);
     await setupVideo(token);

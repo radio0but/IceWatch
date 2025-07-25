@@ -15,6 +15,13 @@ info() {
   echo -e "[INFO] $1"
 }
 
+echo
+read -p "Fuseau horaire du serveur (défaut: America/Toronto) : " TIMEZONE
+TIMEZONE=${TIMEZONE:-America/Toronto}
+
+echo "[INFO] Application du fuseau horaire : $TIMEZONE"
+timedatectl set-timezone "$TIMEZONE"
+timedatectl set-ntp true
 
 # Handle uninstall
 if [[ "$1" == "--uninstall" ]]; then
@@ -55,6 +62,13 @@ MASTER_TOKEN=$(openssl rand -base64 32 | tr -dc 'A-Za-z0-9' | head -c 48)
 # Update system
 apt update && apt upgrade -y
 
+apt install -y apache2-utils
+
+HASH_ADMIN=$(htpasswd -nbBC 10 "" "$LOCAL_ADMIN_PW" | tr -d ':\n')
+HASH_ENSEIGNANT=$(htpasswd -nbBC 10 "" "$LOCAL_ENSEIGNANT_PW" | tr -d ':\n')
+
+
+
 echo "🐘 Installation de PostgreSQL + sudo..."
 apt install -y postgresql sudo
 
@@ -64,6 +78,7 @@ CREATE USER icewatch WITH PASSWORD '${LOCAL_ADMIN_PW}';
 ALTER USER icewatch CREATEDB;
 CREATE DATABASE icewatchdb OWNER icewatch;
 EOF
+
 
 # Install Icecast & Liquidsoap
 apt install -y icecast2 liquidsoap default-jre curl docker.io docker-compose
@@ -210,7 +225,22 @@ EOF
 systemctl daemon-reexec
 systemctl daemon-reload
 systemctl enable icewatch
+echo "[INFO] Démarrage d'IceWatch pour générer les tables PostgreSQL…"
 systemctl start icewatch
+
+# Attend que la table local_user soit disponible (Hibernate)
+until sudo -u postgres psql -d icewatchdb -c "\dt" | grep -q local_user; do
+  echo "⏳ En attente de la création de la table local_user..."
+  sleep 2
+done
+
+sudo -u postgres psql -d icewatchdb <<EOF
+INSERT INTO local_user (username, password, roles) VALUES
+  ('admin',     '$HASH_ADMIN', 'USER,ADMIN'),
+  ('enseignant','$HASH_ENSEIGNANT', 'USER')
+ON CONFLICT (username) DO UPDATE SET password = EXCLUDED.password, roles = EXCLUDED.roles;
+EOF
+
 
 
 echo "🔐 Ajout des permissions sudo pour icewatch (journalctl & restart services)..."
@@ -358,6 +388,72 @@ chmod +x "$SCHEDULER_INSTALL_SCRIPT"
 
 # Exécution
 "$SCHEDULER_INSTALL_SCRIPT"
+
+# ─────────────────────────────────────────────
+# ✅ Vérification/Création manuelle du service video-scheduler (fallback)
+# ─────────────────────────────────────────────
+SERVICE_FILE="/etc/systemd/system/video-scheduler.service"
+SCRIPT_PATH="/opt/owncast-scheduler/video-scheduler.sh"
+
+if [[ -x "$SCRIPT_PATH" ]]; then
+  echo "[INFO] Vérification du service video-scheduler…"
+  if [[ ! -f "$SERVICE_FILE" ]]; then
+    echo "[INFO] Création du service systemd video-scheduler manquant."
+    cat <<EOF > "$SERVICE_FILE"
+[Unit]
+Description=Owncast Video Scheduler
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=$SCRIPT_PATH
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+  fi
+
+  systemctl daemon-reload
+  systemctl enable video-scheduler
+  systemctl restart video-scheduler
+  echo "[✅] Service video-scheduler actif."
+else
+  echo "[⚠️] Script $SCRIPT_PATH introuvable ou non exécutable. Service video-scheduler non activé."
+fi
+
+# ─────────────────────────────────────────────
+# 📂 Vérification/ajout du partage Samba [owncastvideos]
+# ─────────────────────────────────────────────
+SHARE_BLOCK="[owncastvideos]
+   comment = Vidéos horaires Owncast
+   path = /srv/owncast-schedule
+   browseable = yes
+   writable = yes
+   read only = no
+   guest ok = yes
+   create mask = 0666
+   directory mask = 2775
+   force user = nobody
+   force group = nogroup"
+
+if grep -q "^\[owncastvideos\]" /etc/samba/smb.conf; then
+  echo "[INFO] Mise à jour du bloc Samba existant [owncastvideos]..."
+  sed -i "/^\[owncastvideos\]/,/^$/c\\
+$SHARE_BLOCK\\
+" /etc/samba/smb.conf
+else
+  echo "[INFO] Ajout du bloc Samba [owncastvideos]…"
+  echo -e "\n$SHARE_BLOCK\n" >> /etc/samba/smb.conf
+fi
+find /srv/owncast-schedule -type d -exec chmod 2775 {} \;
+find /srv/owncast-schedule -type f -exec chmod 664 {} \;
+chown -R nobody:nogroup /srv/owncast-schedule
+
+systemctl restart smbd
+echo "[✅] Partage Samba [owncastvideos] prêt."
+
 
 # Final Info
 echo

@@ -19,6 +19,12 @@ public class AuthController {
         this.tokenService = tokenService;
         this.config = config;
     }
+    @GetMapping("/config/frontend")
+    public Map<String, String> getFrontendConfig(HttpServletRequest request) {
+        // On peut ajouter le header CORS dynamiquement
+        String allowed = config.getAllowedDomain();
+        return Map.of("apiBase", allowed);
+}
 
     @GetMapping("/auth/token")
     public Map<String,String> getToken(HttpServletRequest req) {

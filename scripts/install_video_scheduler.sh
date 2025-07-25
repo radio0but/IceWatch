@@ -164,7 +164,10 @@ RestartSec=10
 WantedBy=multi-user.target
 EOF
 
-echo "$SYSTEMD_CONTENT" | cmp -s - "$SERVICE_FILE" || echo "$SYSTEMD_CONTENT" > "$SERVICE_FILE"
+if [[ ! -f "$SERVICE_FILE" ]] || ! cmp -s <(echo "$SYSTEMD_CONTENT") "$SERVICE_FILE"; then
+  echo "$SYSTEMD_CONTENT" > "$SERVICE_FILE"
+fi
+
 
 echo "🔧 Service systemd installé : $SERVICE_NAME"
 
