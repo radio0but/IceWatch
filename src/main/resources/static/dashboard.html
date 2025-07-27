@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
+    <link rel="icon" type="image/png" href="${favicon}">
     <meta charset="UTF-8">
     <title>Tableau de bord - Administration Radio</title>
     <link rel="stylesheet" href="/css/dashboard.css">
@@ -11,10 +12,37 @@
 
 <div class="tabs">
     <button class="tab-button active" data-tab="slots">📅 Créneaux</button>
+    <button class="tab-button" data-tab="rss">🗞️ Journal</button>
     <button class="tab-button" data-tab="users">👥 Utilisateurs</button>
-    <button class="tab-button" data-tab="settings">⚙️ Paramètres</button>
-    <button class="tab-button" data-tab="restart">🔄 Redémarrer</button>
+    <button class="tab-button" data-tab="appearance">🧑‍🎨 Personnalisation</button>
+    <button class="tab-button" data-tab="maintenance">🛠️ Maintenance</button>
+
+
 </div>
+
+<!-- Onglet Journal -->
+<div id="tab-rss" class="tab-content">
+  <h2>🗞️ Journal étudiant (via flux RSS)</h2>
+
+  <p>Ce module permet d’afficher automatiquement les derniers articles d’un journal étudiant externe (ex: WordPress) dans la page d’accueil.</p>
+
+  <label for="rss-url">🔗 URL du flux RSS :</label>
+  <input type="text" id="rss-url" placeholder="https://exemple.com/feed" />
+
+  <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+    <button onclick="testRSS()">🔍 Tester le lien</button>
+    <button onclick="saveRSS()">💾 Enregistrer</button>
+    <div style="margin-top: 1rem;">
+  <label>
+    <input type="checkbox" id="rss-show-images" />
+    🖼️ Afficher les images des articles RSS
+  </label>
+</div>
+    <span id="rss-status" style="align-self: center;"></span>
+  </div>
+</div>
+
+
 <!-- Onglet Utilisateurs -->
 <div id="tab-users" class="tab-content active">
     <h2>Gestion des utilisateurs</h2>
@@ -44,50 +72,29 @@
 </div>
 
 <!-- Onglet Paramètres -->
-<div id="tab-settings" class="tab-content">
-    <h2>Personnaliser</h2>
+<div id="tab-appearance" class="tab-content">
+    <h2>🧑‍🎨 Personnalisation de l’apparence</h2>
+
 <p>
   <strong>Instructions :</strong><br>
-  Avant de modifier les paramètres :
+  Toutes les options de personnalisation peuvent être modifiées depuis cette interface.
   <ul style="margin-top:0;">
-    <li><strong>1.</strong> Cliquez sur <strong>♻️ Réinitialiser Apparence</strong> pour repartir d’une configuration propre.</li>
-    <li><strong>2.</strong> Si vous aviez une configuration existante, copiez-la avant et recoller les sections utiles après la réinitialisation.</li>
-    <li><strong>3.</strong> Modifiez les paramètres souhaités, puis cliquez sur <strong>💾 Enregistrer</strong>.</li>
-    <li><strong>4.</strong> <span style="color:red;">Redémarrez IceWatch</span> via l’onglet <strong>🔄 Redémarrer</strong> pour appliquer les changements.</li>
+    <li><strong>1.</strong> Cliquez sur <strong>♻️ Réinitialiser Apparence</strong> pour repartir d’une base propre, si nécessaire.</li>
+    <li><strong>2.</strong> Modifiez les paramètres dans la zone ci-dessous.</li>
+    <li><strong>3.</strong> Cliquez sur <strong>💾 Enregistrer</strong> pour appliquer vos modifications.</li>
+    <li><strong>4.</strong> Rechargez la page si vous souhaitez voir les effets visuels dans le tableau de bord.</li>
   </ul>
-  Les modifications ne seront prises en compte qu’après le redémarrage du service IceWatch.
+  Les modifications sont appliquées immédiatement après l’enregistrement.
 </p>
 
 
-<details style="margin-bottom:1rem;">
-  <summary style="cursor:pointer; font-weight:bold;">🎨 Paramètres d'apparence disponibles (cliquez pour afficher)</summary>
-  <pre style="background:#eee; padding:1rem; overflow:auto; font-size:0.9rem; border-radius:6px;">
-# Titre HTML avec styles (affiché en haut)
-appearance.radio-title=&lt;span style='color:#e53935; font-weight:bold;'&gt;Radio&lt;/span&gt;Rosemont
-
-# Message d'accueil (HTML autorisé)
-appearance.welcome-message=&lt;p style='text-align:center; font-size:1.1rem;'&gt;Bienvenue...&lt;/p&gt;
-
-# Titre de la page de connexion (onglet navigateur)
-appearance.login-title=Connexion | Radio Rosemont
-
-# CSS personnalisé injecté
-appearance.custom-css=body { background: black; }
-
-# Bloc HTML personnalisé (ajouté sous le message d’accueil)
-appearance.custom-html=&lt;div&gt;Contenu personnalisé ici&lt;/div&gt;
-
-# Titre brut (sans HTML) pour métadonnées
-appearance.radio-plain-title=Radio Rosemont
-
-# Favicon (chemin vers image .ico ou .png)
-appearance.favicon=/favicon.png
-  </pre>
-</details>
 
     <textarea id="properties-editor" rows="15" style="width:100%;"></textarea>
     <button onclick="saveProperties()">💾 Enregistrer</button>
     <button onclick="resetAppearance()" class="danger">♻️ Réinitialiser Apparence</button>
+    <h3>📝 Calepin de notes</h3>
+    <p style="margin-top: -0.5rem;">Utilisez cet espace pour conserver des notes sur vos thèmes, configurations ou commentaires techniques. Les modifications sont sauvegardées automatiquement.</p>
+    <textarea id="appearance-notes" rows="8" style="width:100%; resize:vertical; font-family:monospace;" placeholder="Vos notes ici…">${notes}</textarea>
 
 </div>
 <!-- Onglet Créneaux -->
@@ -109,7 +116,7 @@ appearance.favicon=/favicon.png
 </div>
 
 <!-- Onglet Redémarrage -->
-<div id="tab-restart" class="tab-content">
+<div id="tab-maintenance" class="tab-content">
     <h2>Redémarrer IceWatch & Schedulers</h2>
     <p>Utilisez ces boutons pour redémarrer les services.</p>
     <button onclick="restartIceWatch()" class="danger">🚨 Redémarrer IceWatch</button>
@@ -136,7 +143,10 @@ appearance.favicon=/favicon.png
     </div>
 </div>
 
+<div id="Home" style="margin-top: 20px; text-align: center;">
+  <button class="tab-button" onclick="location.href='/index'">📻Revenir à la radio</button>
+</div>
 
-<script src="/js/dashboard.js"></script>
+<script type="module" src="/js/dashboard/index.js"></script>
 </body>
 </html>

@@ -1,67 +1,55 @@
 package com.radioip.backend.config;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import com.radioip.backend.model.AppearanceSettings;
+import com.radioip.backend.service.AppearanceService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@Configuration
-@ConfigurationProperties(prefix = "appearance")
+@Component
 public class AppearanceConfig {
 
-    private String radioTitle = "<span style='color:#e53935; font-weight:bold;'>Radio</span>Rosemont";
-    private String welcomeMessage = "<p style='text-align:center; max-width:720px; margin:0 auto 1rem auto; font-size:1.1rem; line-height:1.6;'>Bienvenue sur la radio étudiante du Cégep Rosemont !<br>Découvrez des prestations musicales, des balados, des capsules éducatives, et plus encore — le tout produit avec passion par notre communauté collégiale.</p>";
-    private String loginTitle = "Connexion | Radio Rosemont";
-    private String customCss = "";
-    private String customHtml = "";
-    private String radioPlainTitle = "Radio Rosemont";
-    private String favicon = "/favicon.png"; // valeur par défaut
+    private final AppearanceService service;
 
-    // Getters et Setters
-    public String getRadioTitle() {
-        return radioTitle;
+    @Autowired
+    public AppearanceConfig(AppearanceService service) {
+        this.service = service;
     }
-    public void setRadioTitle(String radioTitle) {
-        this.radioTitle = radioTitle;
+
+    public AppearanceSettings getSettings() {
+        return service.get();
+    }
+
+    public String getNotes() {
+    return getSettings().getNotes();
+    }
+
+
+    // Facilité d’accès directe si besoin
+    public String getRadioTitle() {
+        return getSettings().getRadioTitle();
     }
 
     public String getWelcomeMessage() {
-        return welcomeMessage;
-    }
-    public void setWelcomeMessage(String welcomeMessage) {
-        this.welcomeMessage = welcomeMessage;
+        return getSettings().getWelcomeMessage();
     }
 
     public String getLoginTitle() {
-        return loginTitle;
-    }
-    public void setLoginTitle(String loginTitle) {
-        this.loginTitle = loginTitle;
+        return getSettings().getLoginTitle();
     }
 
     public String getCustomCss() {
-        return customCss;
-    }
-    public void setCustomCss(String customCss) {
-        this.customCss = customCss;
+        return getSettings().getCustomCss();
     }
 
     public String getCustomHtml() {
-        return customHtml;
-    }
-    public void setCustomHtml(String customHtml) {
-        this.customHtml = customHtml;
+        return getSettings().getCustomHtml();
     }
 
     public String getRadioPlainTitle() {
-        return radioPlainTitle;
-    }
-    public void setRadioPlainTitle(String radioPlainTitle) {
-        this.radioPlainTitle = radioPlainTitle;
+        return getSettings().getRadioPlainTitle();
     }
 
     public String getFavicon() {
-        return favicon;
-    }
-    public void setFavicon(String favicon) {
-        this.favicon = favicon;
+        return getSettings().getFavicon();
     }
 }

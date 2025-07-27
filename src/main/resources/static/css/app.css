@@ -52,6 +52,38 @@ h1 {
   user-select: none;
   color: #fff;
 }
+#emission-info {
+  font-family: 'Inconsolata', monospace;
+  background-color: #111;
+  color: #f1f1f1;
+  padding: 1rem;
+  border-radius: 8px;
+  line-height: 1.6;
+  box-shadow: 0 0 12px rgba(0,0,0,0.3);
+}
+
+#emission-info h1,
+#emission-info h2,
+#emission-info h3 {
+  color: #90caf9;
+  margin-top: 1rem;
+}
+
+#emission-info p {
+  margin: 0.5rem 0;
+}
+
+#emission-info ul {
+  padding-left: 1.5rem;
+}
+
+#emission-info li::marker {
+  color: #90caf9;
+}
+
+#emission-info em {
+  color: #f48fb1;
+}
 
 .button-logout {
   background: var(--accent);
@@ -78,6 +110,16 @@ h1 {
   margin: 0.7rem auto 0.5rem auto;
   max-width: 720px;
   text-align: center;
+}
+.rss-feed {
+  list-style: none;
+  padding-left: 0;
+}
+
+.rss-feed li {
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #e53935;
+  padding-left: 1rem;
 }
 
 audio {
@@ -178,7 +220,16 @@ audio {
   padding: 0.5rem;
   text-align: center;
 }
-
+.rss-thumb {
+  max-width: 300px;
+  max-height: 300px;
+  width: auto;
+  height: auto;
+  display: block;
+  margin: 0 auto 0.5rem auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
 .album-card img {
   max-width: 100%;
   border-radius: 6px;
@@ -197,6 +248,20 @@ audio {
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
+}
+.button-toggle {
+  margin-top: 1rem;
+  background-color: #222;
+  color: #fff;
+  border: 1px solid #666;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button-toggle:hover {
+  background-color: #444;
 }
 
 #prev-button {

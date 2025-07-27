@@ -5,6 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.security.Principal;
+
+
 import java.util.List;
 
 import com.radioip.backend.model.LocalUser; // <-- selon où est ta classe
@@ -57,6 +60,31 @@ public class AdminUserController {
         return ResponseEntity.ok("Utilisateur supprimé");
     }
 
+@PostMapping("/update-password")
+public ResponseEntity<String> updatePassword(@RequestParam String username,
+                                             @RequestParam String newPassword,
+                                             @RequestParam String adminPassword,
+                                             Principal principal) {
+    String adminUsername = principal.getName();
+
+    // Vérifie que l'utilisateur qui fait la demande existe
+    LocalUser adminUser = repo.findById(adminUsername).orElse(null);
+    if (adminUser == null || !adminUser.getRoles().contains("ADMIN")) {
+        return ResponseEntity.status(403).body("Accès refusé");
+    }
+
+    // Vérifie le mot de passe de l'admin
+    if (!encoder.matches(adminPassword, adminUser.getPassword())) {
+        return ResponseEntity.status(403).body("Mot de passe administrateur incorrect");
+    }
+
+    // Change le mot de passe du compte ciblé
+    return repo.findById(username).map(user -> {
+        user.setPassword(encoder.encode(newPassword));
+        repo.save(user);
+        return ResponseEntity.ok("Mot de passe mis à jour");
+    }).orElseGet(() -> ResponseEntity.notFound().build());
+}
 
     @GetMapping("/list")
     public List<LocalUser> listUsers() {

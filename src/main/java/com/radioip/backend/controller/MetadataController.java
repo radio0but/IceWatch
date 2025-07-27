@@ -2,14 +2,24 @@
 package com.radioip.backend.controller;
 
 import com.radioip.backend.config.IceWatchConfig;
+import com.radioip.backend.service.ArtistImageService;
 import com.radioip.backend.service.MetadataService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.radioip.backend.service.ArtistImageService;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.format.TextStyle;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,6 +34,9 @@ public class MetadataController {
         this.config = config;
         this.metadataService = metadataService;
     }
+
+    @Autowired
+    private ArtistImageService artistImageService;
 
     @GetMapping("/radio/metadata")
     public Map<String, String> getMetadata(HttpServletResponse response) {
@@ -68,19 +81,62 @@ public class MetadataController {
 
         return metadataService.enrich(title)
                 .map(enriched -> {
-                    // Assurer que enrich renvoie une Map de type Object
-                    enriched.put("cover", enriched.get("cover"));
+                    enriched.put("cover", enriched.get("cover")); // placeholder
                     return enriched;
                 });
     }
-    @Autowired
-    private ArtistImageService artistImageService;
 
-    // Endpoint pour récupérer l'image de l'artiste
     @GetMapping("/artist/image")
     public String getArtistImage(@RequestParam String artistName) {
         Optional<String> imageUrl = artistImageService.getArtistImage(artistName);
-        return imageUrl.orElse("/static/default-artist-image.png");  // URL de fallback si aucune image n'est trouvée
+        return imageUrl.orElse("/static/default-artist-image.png");
     }
 
+    @GetMapping("/radio/metadata/info")
+    public ResponseEntity<String> getEmissionInfo() {
+        try {
+            LocalDateTime now = LocalDateTime.now();
+            DayOfWeek day = now.getDayOfWeek();
+            String jour = day.getDisplayName(TextStyle.FULL, Locale.FRENCH).toLowerCase();
+            String jourNum = String.valueOf(day.getValue());
+            String heure = String.format("%02d", now.getHour());
+
+            Path pathVideo = Path.of("/srv/owncast-schedule", jourNum + capitalize(jour), heure);
+            Path pathAudio = Path.of("/srv/radioemissions", jour, heure);
+
+            System.out.println("📺 pathVideo: " + pathVideo);
+            System.out.println("📻 pathAudio: " + pathAudio);
+
+            // Vidéo
+            if (Files.exists(pathVideo.resolve("play")) || Files.exists(pathVideo.resolve("live"))) {
+                Path info = pathVideo.resolve("info.md");
+                if (Files.exists(info)) return readMarkdown(info);
+            }
+
+            // Audio
+            Path info = pathAudio.resolve("info.md");
+            if (Files.exists(info)) return readMarkdown(info);
+
+
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Erreur interne");
+        }
+    }
+
+    private ResponseEntity<String> readMarkdown(Path infoPath) {
+        try {
+            String md = Files.readString(infoPath, StandardCharsets.UTF_8);
+            return ResponseEntity.ok(md);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Erreur lecture info.md");
+        }
+    }
+
+    private String capitalize(String str) {
+        return str == null || str.isEmpty()
+                ? str
+                : str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
 }

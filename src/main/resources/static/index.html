@@ -7,20 +7,27 @@
   <title>${radio.plainTitle}</title>
   <link rel="stylesheet" href="/css/app.css">
   <style>${custom.css}</style>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 </head>
 <body>
   <h1>${radio.title}</h1>
   <p>${welcome.message}</p>
   ${custom.html}
+<div id="admin-link" style="display: none; margin-top: 20px; text-align: center;">
+  <button class="tab-button" onclick="location.href='/dashboard'">🔧 Tableau de bord</button>
+</div>
+
 
   <div class="tabs">
     <button class="tab-button active" data-tab="radio">🎧 Radio</button>
-    <button class="tab-button" data-tab="video">🎥 Vidéo</button>
+    <button class="tab-button" data-tab="video">🎥 Télévision</button>
+    ${journal.button}
     ${logout.button}
   </div>
 
   <div id="tab-radio" class="tab-content active">
-    
+    <div id="audio-description"></div>
     <div id="player-container">Chargement du lecteur audio…</div>
     <div id="metadata">Chargement des infos…</div>
 <!--     <div id="artist-image-container">
@@ -37,12 +44,13 @@
   </div>
 
   <div id="tab-video" class="tab-content">
+    <div id="video-description"></div>
     <div id="video-container">Chargement du lecteur vidéo…</div>
   </div>
-
+  ${journal.tab}
   ${logout.tab}
 
-<script src="/js/radio.js"></script>
+<script type="module" src="/js/portal/index.js"></script>
 
 </body>
 </html>

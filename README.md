@@ -1,139 +1,160 @@
-# IceWatch
+## 📱 IceWatch – Système sécurisé de diffusion audio/vidéo
 
-**IceWatch** is a secure Spring Boot backend designed to proxy and protect audio/video streams served by **Icecast** and **Owncast**. It enables dynamic token-based access control, referer validation, and seamless frontend integration through a secured portal.
-
----
-
-## 🎯 Features
-
-- 🔐 **Token-based access**: Dynamic tokens tied to referer headers.
-- 🧾 **Master token support**: For trusted external systems like mobile apps or portals.
-- 🛡️ **Reverse proxy**: Proxies all Owncast and Icecast resources through a single domain.
-- 🌐 **CORS configuration**: Supports frontend applications securely.
-- ⚙️ **Centralized config**: Easily configurable via `application.properties` or environment variables.
-- 🔑 **Login Portal**: A simple authentication system supports local accounts or LDAP integration.
-- 🏢 **Admin Dashboard**: Reserved area for user management, token inspection, and stream status.
-- 🎬 **Owncast Video Scheduler**: Automatically streams pre-scheduled video folders using ffmpeg, with support for switching to live mode.
+**IceWatch** est un backend Java (Spring Boot) conçu pour **sécuriser et proxyfier les flux audio et vidéo** diffusés via [Icecast](https://icecast.org) et [Owncast](https://owncast.online). Il permet de restreindre l'accès par jeton dynamique, de valider l'origine des requêtes (Referer), et de diffuser les flux dans un **portail sécurisé compatible LDAP**.
 
 ---
 
-## 🛠 Configuration
+### 🎯 Fonctionnalités
 
-In `src/main/resources/application.properties`, you can set:
-
-```
-server.port=9090
-icewatch.master-token=MASTER_SECRET_TOKEN
-icewatch.allowed-domain=https://your-frontend-domain.com
-icewatch.owncast-url=http://localhost:8123
-icewatch.icecast-stream-url=http://localhost:8000/radio
-```
-
-⚠️ Be sure to change `MASTER_SECRET_TOKEN` before deploying in production!
+- 🔐 **Accès par jeton dynamique** basé sur le `Referer`
+- 🧾 **Token maître** pour les intégrations de confiance (ex. : Omnivox, apps mobiles)
+- 🛡️ **Reverse proxy intégré** pour tous les flux Owncast/Icecast (1 seul domaine exposé)
+- 🌐 **CORS configurable** pour l’intégration frontend
+- ⚙️ **Configuration centralisée** (`application.properties`)
+- 🔑 **Portail de connexion** avec support LDAP ou comptes locaux
+- 🧑‍💼 **Tableau de bord admin** pour la gestion des utilisateurs et du système
+- 🎮 **Ordonnanceur Owncast** : diffusion automatisée de dossiers vidéo
+- 🎧 **Scheduler Radio (Liquidsoap)** : diffusion audio horaire via dossiers et script `run.sh`
 
 ---
 
-## 🚀 How It Works
-
-- `/auth/token`: Issues short-lived tokens if the request comes from a valid referer.
-- `/radio`: Proxies the Icecast stream, protected by token.
-- `/owncast/**`: Proxies Owncast resources and embeds, with protection on sensitive routes.
-- `/radio/metadata`: Fetches current song title from Icecast.
-- `/login`: Login page with username/password form (supports LDAP if enabled).
-- `/dashboard`: Admin area for managing users and checking system status.
-
----
-
-## 🧪 Development
+### 🚀 Déploiement serveur
 
 ```bash
-# Build and run
-./mvnw clean package
-java -jar target/backend-0.0.1-SNAPSHOT.jar
+curl -fsSL https://github.com/radio0but/IceWatch/releases/download/v0.0.1/install.sh | bash
 ```
 
----
-
-## 📄 License
-
-MIT — free to use, modify, and contribute. Feel free to submit pull requests or open issues!
+Le script installe Icecast, Owncast, Liquidsoap et IceWatch automatiquement sur un serveur Debian ou LXC. Il configure aussi les partages Samba et les services systemd.
 
 ---
 
+### 📁 Structure du projet
 
+- `/src/main/java/` – Backend Spring Boot (authentification, proxy, sécurité)
+- `/src/main/resources/static/` – Interface HTML + JavaScript
+- `application.properties` – Fichier de configuration centralisé
+- `scripts/run.sh` – Scheduler Liquidsoap (audio)
+- `scripts/video-scheduler.sh` – Scheduler ffmpeg/Owncast (vidéo)
+- `README.md`, `LICENSE`, etc.
 
 ---
 
-## 📦 IceWatch Stack Installation
+### 🚤 Déploiement des postes clients
 
 ```bash
-curl -L https://github.com/radio0but/IceWatch/releases/download/v0.0.1/installer.sh \
-  -o install.sh && chmod +x install.sh && ./install.sh
+bash <(curl -fsSL https://github.com/radio0but/IceWatch/releases/download/v0.0.1/InstallApps.sh) --plasma
 ```
 
-### ❓ Installer Prompts
+Ce script configure automatiquement un poste Manjaro KDE avec :
 
-The installer will guide you through the following interactive setup:
+- Mise à jour système
+- Installation de Mixxx, OBS, QjackCtl, Kdenlive, etc.
+- Import des paramètres visuels Plasma (optionnel)
+- Montage automatique du partage `~/radioemissions`
 
-- Icecast admin username and password (source + relay)
-- Domain name authorized as Referer (e.g., [https://radio.boogiepit.com](https://radio.boogiepit.com))
-- Owncast admin password
-- Port for IceWatch API (default: 9090)
-- Passwords for local users `admin` and `enseignant`
-- LDAP activation prompt (optional)
-  - If enabled: LDAP URL, base DN, bind DN and password will be requested
-- Samba share for `/srv/radioemissions`
-- Download of `run.sh` scheduler script for Liquidsoap
-- Download of Liquidsoap template (`radio.liq.template`) and setup of `play.sh`
-- Automatic creation of day/hour folders
-- Final step: install and configure the **Owncast video scheduler** (with ffmpeg test and stream key verification)
+Options disponibles :
 
-🚨 When prompted about configuring Icecast via debconf, choose **No** — the script configures it for you automatically.
+- `--plasma` : installation + configuration graphique
+- `--update` : mise à jour uniquement
 
 ---
 
-## 📅 Scheduler & AutoDJ (Audio)
+### 🎵 Scheduler Radio (Liquidsoap)
 
-- Playlist folders by day/hour (e.g., `7Samedi/14/`)
-- Add a `radio.liq` file to enable AutoDJ
-- Add a `live` file to switch to live
-- Automatically switches back if `live` is deleted
-
----
-
-## 🎬 Video Scheduler
-
-IceWatch includes a headless video scheduler for **Owncast**, allowing pre-programmed video playback via RTMP.
-
-### How It Works
-
-- Videos are organized by day and hour folders (e.g., `/srv/owncast-schedule/7Samedi/14/`)
-- If a `play` file is found in the current hour's folder, it triggers automatic streaming via ffmpeg
-- If a `live` file exists, it immediately stops the schedule and leaves control to the live broadcaster
-- Automatically resumes when the `live` file is removed
-
-### Example Folder
-
-```
-/srv/owncast-schedule/
-├── 7Samedi/
-│   └── 14/
-│       ├── play
-│       ├── video1.mp4
-│       └── video2.mp4
-```
+- Utilise des dossiers par jour/heure (`radioemissions/jour/heure/`)
+- `radio.liq` déclenche l'AutoDJ pour une plage horaire
+- Fichier `live` permet d'interrompre le scheduler pour une diffusion en direct (via Mixxx)
+- Scheduler activé par `run.sh` tournant en service systemd
 
 ---
 
-## 💻 Client Setup (Manjaro KDE)
+### 🎥 Scheduler Vidéo (Owncast + FFmpeg)
+
+- Dossiers organisés par jour/heure dans `/srv/owncast-schedule`
+- Sous-dossier `video/` contient les vidéos à lire
+- Fichier `play` active la diffusion automatique
+- Fichier `live` permet d’interrompre pour du direct OBS
+- Script `video-scheduler.sh` actif en tâche de fond
+
+---
+
+### 📒 Documentation complète
+
+Voir le dossier `docs/` ou la [documentation pédagogique](https://github.com/radio0but/IceWatch/wiki) *(en développement)*.
+
+---
+
+## 📱 IceWatch – Secure audio/video proxy backend
+
+**IceWatch** is a secure Spring Boot backend designed to proxy and protect audio/video streams served by **Icecast** and **Owncast**. It provides token-based access control, referer validation, and a secure frontend portal with optional LDAP support.
+
+---
+
+### 🎯 Features
+
+- 🔐 **Token-based access** linked to the `Referer` header
+- 🧾 **Master token** for trusted systems like Omnivox or mobile apps
+- 🛡️ **Built-in reverse proxy** for Owncast and Icecast (1 exposed domain)
+- 🌐 **Custom CORS config** for frontend integration
+- ⚙️ **Centralized config** via `application.properties`
+- 🔑 **Login portal** with LDAP/local authentication
+- 🧑‍💼 **Admin dashboard** with user management and monitoring
+- 🎮 **Owncast Scheduler**: automated video streaming from folder-based schedules
+- 🎧 **Radio Scheduler (Liquidsoap)**: timed audio streaming via folder-based structure
+
+---
+
+### 🚀 Quick Install (server)
 
 ```bash
-bash <(curl -fsSL https://github.com/radio0but/IceWatch/releases/download/v0.0.1/client.sh) --plasma
+curl -fsSL https://github.com/radio0but/IceWatch/releases/download/v0.0.1/install.sh | bash
 ```
 
-Alternate modes: `--update`, `--plasma`, or run without options for full install.
+Installs Icecast, Owncast, Liquidsoap, IceWatch, and configures Samba shares and systemd services.
 
 ---
+
+### 🚤 Client Setup (Manjaro KDE)
+
+```bash
+bash <(curl -fsSL https://github.com/radio0but/IceWatch/releases/download/v0.0.1/InstallApps.sh) --plasma
+```
+
+This installs and configures:
+
+- Audio/video tools (Mixxx, OBS, QjackCtl, Kdenlive...)
+- Plasma visual settings (optional)
+- Mounts `~/radioemissions` automatically
+
+Options:
+
+- `--plasma` = install + Plasma config
+- `--update` = update only
+
+---
+
+### 🎵 Radio Scheduler (Liquidsoap)
+
+- Folder structure: `radioemissions/day/hour/`
+- `radio.liq` triggers AutoDJ for a time slot
+- `live` file interrupts AutoDJ for live shows
+- Runs in background via `run.sh` (systemd)
+
+---
+
+### 🎥 Video Scheduler (Owncast + FFmpeg)
+
+- Folders: `/srv/owncast-schedule/Day/Hour/video/`
+- Add `play` to activate scheduled streaming
+- Add `live` to interrupt and allow live OBS stream
+- Script `video-scheduler.sh` runs in background
+
+---
+
+### 📒 Full Documentation
+
+See `docs/` or [pedagogical guide](https://github.com/radio0but/IceWatch/wiki) *(in progress)*.
+
 
 ❤️ Made by Marc-André Legault 2025 — Supporting open-source pedagogy at Cégep Rosemont.
 

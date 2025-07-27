@@ -19,6 +19,20 @@ public class AuthController {
         this.tokenService = tokenService;
         this.config = config;
     }
+    @GetMapping("/auth/me")
+    public Map<String, Object> me(HttpServletRequest req) {
+    var user = req.getUserPrincipal();
+    if (user == null) {
+        return Map.of("authenticated", false);
+    }
+
+    boolean isAdmin = req.isUserInRole("ADMIN");
+    return Map.of(
+        "authenticated", true,
+        "username", user.getName(),
+        "role", isAdmin ? "ADMIN" : "USER"
+    );
+}
     @GetMapping("/config/frontend")
     public Map<String, String> getFrontendConfig(HttpServletRequest request) {
         // On peut ajouter le header CORS dynamiquement

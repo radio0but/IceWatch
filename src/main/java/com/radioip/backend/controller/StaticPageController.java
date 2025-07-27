@@ -1,5 +1,12 @@
 package com.radioip.backend.controller;
 
+import com.radioip.backend.repository.SettingRepository;
+import com.radioip.backend.model.Setting;
+import java.util.Optional;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+
 import com.radioip.backend.config.IceWatchConfig;
 import com.radioip.backend.config.AppearanceConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +22,9 @@ import java.nio.charset.StandardCharsets;
 
 @RestController
 public class StaticPageController {
+
+    @Autowired
+    private SettingRepository settingRepository;
 
     @Autowired
     private AppearanceConfig appearance;
@@ -42,32 +52,64 @@ public class StaticPageController {
         sendHtmlWithSubstitutions("static/dashboard.html", response);
     }
 
-    private void sendHtmlWithSubstitutions(String path, HttpServletResponse response) throws IOException {
-        String html = StreamUtils.copyToString(new ClassPathResource(path).getInputStream(), StandardCharsets.UTF_8);
-        String logoutButton = "";
-        String logoutTab = "";
+private void sendHtmlWithSubstitutions(String path, HttpServletResponse response) throws IOException {
+    String html = StreamUtils.copyToString(new ClassPathResource(path).getInputStream(), StandardCharsets.UTF_8);
+    String logoutButton = "";
+    String logoutTab = "";
+    String journalButton = "";
+    String journalTab = "";
 
-        if (!config.isDisableLogin()) {
-            logoutButton = "<button class=\"tab-button\" data-tab=\"logout\">🚪 Déconnexion</button>";
-            logoutTab =
-                "<div id=\"tab-logout\" class=\"tab-content\" style=\"text-align:center;\">\n" +
-                "  <p style=\"margin: 2rem;\">Cliquez ci-dessous pour vous déconnecter.</p>\n" +
-                "  <a href=\"/logout\" class=\"button-logout\">🔒 Se déconnecter</a>\n" +
-                "</div>";
-        }
-
-        html = html
-            .replace("${radio.title}", appearance.getRadioTitle())
-            .replace("${radio.plainTitle}", appearance.getRadioPlainTitle())
-            .replace("${welcome.message}", appearance.getWelcomeMessage())
-            .replace("${login.title}", appearance.getLoginTitle())
-            .replace("${favicon}", appearance.getFavicon())
-            .replace("${custom.css}", appearance.getCustomCss())
-            .replace("${custom.html}", appearance.getCustomHtml())
-            .replace("${logout.button}", logoutButton)
-            .replace("${logout.tab}", logoutTab);
-
-        response.setContentType("text/html; charset=UTF-8");
-        response.getWriter().write(html);
+    // Vérifie si un flux RSS est défini ET accessible (code HTTP 200)
+    Optional<Setting> rss = settingRepository.findByKey("rss-url");
+    if (rss.isPresent() && isValidRSS(rss.get().getValue())) {
+        journalButton = "<button class=\"tab-button\" id=\"journal-tab-button\" data-tab=\"journal\">🗞️ Journal</button>";
+        journalTab =
+            "<div id=\"tab-journal\" class=\"tab-content\">\n" +
+            "  <h2>🗞️ Journal étudiant</h2>\n" +
+            "  <ul id=\"journal-articles\" class=\"rss-feed\">Chargement…</ul>\n" +
+            "<button id=\"toggle-rss\" class=\"button-toggle\">📜 Afficher tout</button>" +
+            "</div>";
     }
+    if (!config.isDisableLogin()) {
+        logoutButton = "<button class=\"tab-button\" data-tab=\"logout\">🚪 Déconnexion</button>";
+        logoutTab =
+            "<div id=\"tab-logout\" class=\"tab-content\" style=\"text-align:center;\">\n" +
+            "  <p style=\"margin: 2rem;\">Cliquez ci-dessous pour vous déconnecter.</p>\n" +
+            "  <a href=\"/logout\" class=\"button-logout\">🔒 Se déconnecter</a>\n" +
+            "</div>";
+    }
+
+
+    html = html
+        .replace("${radio.title}", appearance.getRadioTitle())
+        .replace("${radio.plainTitle}", appearance.getRadioPlainTitle())
+        .replace("${welcome.message}", appearance.getWelcomeMessage())
+        .replace("${login.title}", appearance.getLoginTitle())
+        .replace("${favicon}", appearance.getFavicon())
+        .replace("${custom.css}", appearance.getCustomCss())
+        .replace("${custom.html}", appearance.getCustomHtml())
+        .replace("${logout.button}", logoutButton)
+        .replace("${logout.tab}", logoutTab)
+        .replace("${journal.button}", journalButton)
+        .replace("${journal.tab}", journalTab)
+        .replace("${notes}", appearance.getNotes() != null ? appearance.getNotes() : "");
+
+
+    response.setContentType("text/html; charset=UTF-8");
+    response.getWriter().write(html);
+}
+private boolean isValidRSS(String urlStr) {
+    try {
+        URL url = new URL(urlStr);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+        conn.setConnectTimeout(3000);
+        conn.connect();
+        return conn.getResponseCode() == 200;
+    } catch (Exception e) {
+        return false;
+    }
+}
+
 }
