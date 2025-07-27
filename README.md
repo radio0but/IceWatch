@@ -163,7 +163,6 @@ See `docs/` or [pedagogical guide](https://github.com/radio0but/IceWatch/wiki) *
 ![Capture 3](https://imgur.com/FUukYxH.png)
 ![Capture 4](https://imgur.com/IqIs9xE.png)
 ![Capture 5](https://imgur.com/RsfJI6r.png)
-![Capture 6](https://imgur.com/HLyAXKg.png)
 ![Capture 7](https://imgur.com/Ej6zDcg.png)
 ![Capture 8](https://imgur.com/0tHdGwQ.png)
 ![Capture 9](https://imgur.com/c3NmD6G.png)
