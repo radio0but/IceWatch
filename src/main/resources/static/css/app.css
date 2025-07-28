@@ -52,37 +52,65 @@ h1 {
   user-select: none;
   color: #fff;
 }
-#emission-info {
-  font-family: 'Inconsolata', monospace;
-  background-color: #111;
-  color: #f1f1f1;
-  padding: 1rem;
-  border-radius: 8px;
+#audio-description,
+#video-description {
+  background: #1c1c1c;
+  border: 1px solid #333;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  margin-bottom: 2rem;
+  color: #e0e0e0;
+  font-size: 1rem;
   line-height: 1.6;
-  box-shadow: 0 0 12px rgba(0,0,0,0.3);
+  max-width: 900px;
+  margin: 0 0 2rem 0;
+  box-shadow: 0 0 10px #0008;
 }
 
-#emission-info h1,
-#emission-info h2,
-#emission-info h3 {
-  color: #90caf9;
+#audio-description h3,
+#video-description h3 {
   margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+  color: #ff5252;
+  font-weight: bold;
 }
 
-#emission-info p {
-  margin: 0.5rem 0;
-}
-
-#emission-info ul {
+#audio-description ul,
+#video-description ul {
   padding-left: 1.5rem;
 }
 
-#emission-info li::marker {
-  color: #90caf9;
+#audio-description li,
+#video-description li {
+  margin-bottom: 0.5rem;
 }
 
-#emission-info em {
-  color: #f48fb1;
+#audio-description em,
+#video-description em {
+  color: #bbb;
+  font-style: italic;
+}
+
+#audio-description strong,
+#video-description strong {
+  color: #fff;
+}
+
+#audio-description blockquote,
+#video-description blockquote {
+  margin: 1rem 0;
+  padding-left: 1rem;
+  border-left: 4px solid #555;
+  color: #ccc;
+  font-style: italic;
+}
+#radio-layout {
+  text-align: initial;
+}
+#radio-right > * {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .button-logout {
@@ -378,4 +406,76 @@ h2 {
 
 .fade-in {
   opacity: 1;
+}
+
+/* Conteneur horizontal pour radio : description à gauche, contenu à droite */
+#radio-layout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+  flex-wrap: wrap;
+}
+
+#audio-description {
+  flex: 1 1 300px;
+  max-width: 500px;
+}
+
+#radio-right {
+  flex: 1 1 300px;
+  max-width: 640px;
+}
+
+
+
+@media (max-width: 1024px) {
+  #radio-layout {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  #audio-description,
+  #radio-right {
+    max-width: 100%;
+  }
+}
+#video-layout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+  flex-wrap: wrap;
+  text-align: initial;
+}
+
+#video-description {
+  flex: 1 1 300px;
+  max-width: 500px;
+}
+
+#video-container {
+  flex: 1 1 300px;
+  max-width: 640px;
+}
+
+#video-container > * {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 1024px) {
+  #video-layout {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  #video-description,
+  #video-container {
+    max-width: 100%;
+  }
 }

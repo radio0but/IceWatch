@@ -84,3 +84,15 @@ window.scrollCarousel = function (dir) {
   container.style.transform = `translateX(-${currentSlide * cardWidth}px)`;
   stopAutoScroll();
 };
+document.addEventListener("DOMContentLoaded", () => {
+  const prevButton = document.getElementById("prev-button");
+  const nextButton = document.getElementById("next-button");
+
+  if (prevButton) {
+    prevButton.addEventListener("click", () => window.scrollCarousel(-1));
+  }
+
+  if (nextButton) {
+    nextButton.addEventListener("click", () => window.scrollCarousel(1));
+  }
+}); // ← Ceci était manquant

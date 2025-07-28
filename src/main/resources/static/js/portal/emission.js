@@ -4,53 +4,50 @@ export async function loadEmissionDescriptions() {
     if (!res.ok) return;
 
     const data = await res.json();
-    const { audio, video } = data;
+    const { audioInfo, videoInfo } = data;
 
-    // Description audio (radio)
-    if (audio) {
-      const tabRadio = document.getElementById("tab-radio");
-      if (tabRadio) {
-        const old = document.getElementById("audio-description");
-        if (old) old.remove();
 
-        const container = document.createElement("div");
-        container.id = "audio-description";
-        container.style.marginBottom = "1rem";
-        container.style.padding = "0.5rem";
-        container.style.background = "#222";
-        container.style.borderRadius = "0.5rem";
+// Description audio (radio)
+if (audioInfo) {
+  const old = document.querySelector("#radio-layout #audio-description");
+  if (old) {
+    const container = document.createElement("div");
+    container.id = "audio-description";
+    container.style.marginBottom = "1rem";
+    container.style.padding = "0.5rem";
+    container.style.background = "#222";
+    container.style.borderRadius = "0.5rem";
 
-        container.innerHTML = `
-          <h3 style="margin-top:0;">ℹ️ Émission Radio</h3>
-          ${window.marked ? marked.parse(audioInfo) : `<p>${audioInfo}</p>`}
-        `;
+    container.innerHTML = `
+      <h3 style="margin-top:0;">ℹ️ Émission Radio</h3>
+      ${window.marked ? marked.parse(audioInfo) : `<p>${audioInfo}</p>`}
+    `;
 
-        tabRadio.prepend(container);
-      }
-    }
+    old.replaceWith(container);
+  }
+}
 
-    // Description vidéo (télévision)
-    if (video) {
-      const tabVideo = document.getElementById("tab-video");
-      if (tabVideo) {
-        const old = document.getElementById("video-description");
-        if (old) old.remove();
 
-        const container = document.createElement("div");
-        container.id = "video-description";
-        container.style.marginBottom = "1rem";
-        container.style.padding = "0.5rem";
-        container.style.background = "#222";
-        container.style.borderRadius = "0.5rem";
+// Description vidéo (télévision)
+if (videoInfo) {
+  const old = document.querySelector("#video-layout #video-description");
+  if (old) {
+    const container = document.createElement("div");
+    container.id = "video-description";
+    container.style.marginBottom = "1rem";
+    container.style.padding = "0.5rem";
+    container.style.background = "#222";
+    container.style.borderRadius = "0.5rem";
 
-        container.innerHTML = `
-          <h3 style="margin-top:0;">ℹ️ Émission Télévision</h3>
-          ${window.marked ? marked.parse(videoInfo) : `<p>${videoInfo}</p>`}
-        `;
+    container.innerHTML = `
+      <h3 style="margin-top:0;">ℹ️ Émission Télévision</h3>
+      ${window.marked ? marked.parse(videoInfo) : `<p>${videoInfo}</p>`}
+    `;
 
-        tabVideo.prepend(container);
-      }
-    }
+    old.replaceWith(container);
+  }
+}
+
   } catch (err) {
     console.warn("Impossible de charger la description d’émission :", err);
   }

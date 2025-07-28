@@ -34,3 +34,22 @@ export async function restartIceWatch() {
     alert("Erreur lors du redémarrage : " + error.message);
   }
 }
+export async function loadLog(type) {
+  const serviceName = type === "video" ? "video-scheduler" : "radio-scheduler";
+  try {
+    const res = await fetch(`/admin/settings/logs/${serviceName}`);
+    const text = await res.text();
+    const textarea = document.getElementById(`log-${type}`);
+    if (textarea) {
+      textarea.value = text;
+    }
+  } catch (err) {
+    const textarea = document.getElementById(`log-${type}`);
+    if (textarea) {
+      textarea.value = `Erreur de chargement des logs ${type} : ${err.message}`;
+    }
+  }
+}
+
+window.loadLog = loadLog;
+

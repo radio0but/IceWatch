@@ -13,7 +13,7 @@
 <body>
   <h1>${radio.title}</h1>
   <p>${welcome.message}</p>
-  ${custom.html}
+ 
 <div id="admin-link" style="display: none; margin-top: 20px; text-align: center;">
   <button class="tab-button" onclick="location.href='/dashboard'">🔧 Tableau de bord</button>
 </div>
@@ -26,27 +26,31 @@
     ${logout.button}
   </div>
 
-  <div id="tab-radio" class="tab-content active">
+<div id="tab-radio" class="tab-content active">
+  <div id="radio-layout">
     <div id="audio-description"></div>
-    <div id="player-container">Chargement du lecteur audio…</div>
-    <div id="metadata">Chargement des infos…</div>
-<!--     <div id="artist-image-container">
-        <p>Image de l'artiste :</p>
-        <img id="artist-image" src="" alt="Image de l'artiste" />
-    </div> -->
-    <div id="carousel-wrapper" style="display:none">
-      <div id="carousel">
-        <div class="carousel-inner" id="carousel-inner"></div>
-        <button id="prev-button" class="carousel-button"><img src="/gauche.png"></img></button>
-        <button id="next-button" class="carousel-button"><img src="/droite.png"></img></button>
+    <div id="radio-right">
+      <div id="player-container">Chargement du lecteur audio…</div>
+      <div id="metadata">Chargement des infos…</div>
+      <div id="carousel-wrapper" style="display:none">
+        <div id="carousel">
+          <div class="carousel-inner" id="carousel-inner"></div>
+          <button id="prev-button" class="carousel-button"><img src="/gauche.png" alt="◀️"></button>
+          <button id="next-button" class="carousel-button"><img src="/droite.png" alt="▶️"></button>
+        </div>
       </div>
+       ${custom.html}
     </div>
   </div>
+</div>
 
   <div id="tab-video" class="tab-content">
+  <div id="video-layout">
     <div id="video-description"></div>
     <div id="video-container">Chargement du lecteur vidéo…</div>
   </div>
+   ${custom.html}
+</div>
   ${journal.tab}
   ${logout.tab}
 
