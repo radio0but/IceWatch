@@ -299,7 +299,29 @@ audio {
 #next-button {
   right: 0;
 }
+.logo-antenna {
+  font-size: 1.5rem;
+  margin-left: 0.3em;
+  vertical-align: -0.2em;
+  opacity: 0.77;
+}
 
+
+.logo-antenna {
+  font-size: 1.5rem;
+  margin-left: 0.3em;
+  vertical-align: -0.2em;
+  opacity: 0.87;
+  filter: drop-shadow(0 0 16px #e53935bb);
+  animation: pulse 2s infinite;
+}
+
+
+@keyframes pulse {
+  0% { filter: drop-shadow(0 0 8px #e53935bb);}
+  50% { filter: drop-shadow(0 0 24px #e5393588);}
+  100% { filter: drop-shadow(0 0 8px #e53935bb);}
+}
 h2 {
     text-align: center;
 }
