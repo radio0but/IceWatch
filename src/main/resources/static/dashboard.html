@@ -4,7 +4,7 @@
     <link rel="icon" type="image/png" href="${favicon}">
     <meta charset="UTF-8">
     <title>Tableau de bord - Administration Radio</title>
-    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/dashboard/index.css">
     <style>${custom.css}</style>
 </head>
 <body>
@@ -73,29 +73,29 @@
 
 <!-- Onglet Paramètres -->
 <div id="tab-appearance" class="tab-content">
-    <h2>🧑‍🎨 Personnalisation de l’apparence</h2>
+  <h2>🧑‍🎨 Personnalisation de l’apparence</h2>
 
-<p>
-  <strong>Instructions :</strong><br>
-  Toutes les options de personnalisation peuvent être modifiées depuis cette interface.
-  <ul style="margin-top:0;">
-    <li><strong>1.</strong> Cliquez sur <strong>♻️ Réinitialiser Apparence</strong> pour repartir d’une base propre, si nécessaire.</li>
-    <li><strong>2.</strong> Modifiez les paramètres dans la zone ci-dessous.</li>
-    <li><strong>3.</strong> Cliquez sur <strong>💾 Enregistrer</strong> pour appliquer vos modifications.</li>
-    <li><strong>4.</strong> Rechargez la page si vous souhaitez voir les effets visuels dans le tableau de bord.</li>
-  </ul>
-  Les modifications sont appliquées immédiatement après l’enregistrement.
-</p>
+  <p>
+    <strong>Instructions :</strong><br>
+    Toutes les options de personnalisation peuvent être modifiées depuis cette interface.
+    <ul style="margin-top:0;">
+      <li><strong>1.</strong> Cliquez sur <strong>♻️ Réinitialiser Apparence</strong> pour repartir d’une base propre, si nécessaire.</li>
+      <li><strong>2.</strong> Modifiez les paramètres dans la zone ci-dessous.</li>
+      <li><strong>3.</strong> Cliquez sur <strong>📎 Enregistrer</strong> pour appliquer vos modifications.</li>
+      <li><strong>4.</strong> Rechargez la page si vous souhaitez voir les effets visuels dans le tableau de bord.</li>
+    </ul>
+    Les modifications sont appliquées immédiatement après l’enregistrement.
+  </p>
 
+  <textarea id="properties-editor" rows="15" style="width:100%;"></textarea>
+  <button id="save-button">📎 Enregistrer</button>
+  <button id="reset-button" class="danger">♻️ Réinitialiser Apparence</button>
 
-
-    <textarea id="properties-editor" rows="15" style="width:100%;"></textarea>
-    <button onclick="saveProperties()">💾 Enregistrer</button>
-    <button onclick="resetAppearance()" class="danger">♻️ Réinitialiser Apparence</button>
-    <h3>📝 Calepin de notes</h3>
-    <p style="margin-top: -0.5rem;">Utilisez cet espace pour conserver des notes sur vos thèmes, configurations ou commentaires techniques. Les modifications sont sauvegardées automatiquement.</p>
-    <textarea id="appearance-notes" rows="8" style="width:100%; resize:vertical; font-family:monospace;" placeholder="Vos notes ici…">${notes}</textarea>
-
+  <h3>📝 Calepin de notes</h3>
+  <p style="margin-top: -0.5rem;">
+    Utilisez cet espace pour conserver des notes sur vos thèmes, configurations ou commentaires techniques. Les modifications sont sauvegardées automatiquement.
+  </p>
+  <textarea id="appearance-notes" rows="8" style="width:100%; resize:vertical; font-family:monospace;" placeholder="Vos notes ici…">\${notes}</textarea>
 </div>
 <!-- Onglet Créneaux -->
 <!-- Onglet Créneaux -->
@@ -117,31 +117,38 @@
 
 <!-- Onglet Redémarrage -->
 <div id="tab-maintenance" class="tab-content">
-    <h2>Redémarrer IceWatch & Schedulers</h2>
-    <p>Utilisez ces boutons pour redémarrer les services.</p>
-    <button onclick="restartIceWatch()" class="danger">🚨 Redémarrer IceWatch</button>
-    
-    <div style="margin-top: 1rem;">
-      <button onclick="restartVideoScheduler()" class="danger">
-        🎬 Redémarrer Vidéo Scheduler
-      </button>
-      <button onclick="restartRadioScheduler()" class="danger">
-        📻 Redémarrer Radio Scheduler
-      </button>
-      <h3 style="margin-top: 2rem;">🎬 Logs Vidéo Scheduler</h3>
-<button onclick="loadLog('video')">🔄 Actualiser</button>
-<textarea id="log-video" rows="12" readonly style="width:100%; margin-top:0.5rem;"></textarea>
+  <h2>Redémarrer IceWatch & Schedulers</h2>
+  <p>Utilisez ces boutons pour redémarrer les services.</p>
 
-    </div>
+  <button id="restart-button" class="danger">
+    🚨 Redémarrer IceWatch <span id="status-restart"></span>
+  </button>
 
-    <div style="margin-top: 0.5rem;">
-      <br>
-      <h3 style="margin-top: 2rem;">📻 Logs Radio Scheduler</h3>
-<button onclick="loadLog('radio')">🔄 Actualiser</button>
-<textarea id="log-radio" rows="12" readonly style="width:100%; margin-top:0.5rem;"></textarea>
-      
-    </div>
+  <div style="margin-top: 1rem;">
+    <button id="restart-video-button" class="danger">
+      🎬 Redémarrer Vidéo Scheduler <span id="status-restart-video"></span>
+    </button>
+    <button id="restart-radio-button" class="danger">
+      📻 Redémarrer Radio Scheduler <span id="status-restart-radio"></span>
+    </button>
+
+    <h3 style="margin-top: 2rem;">🎬 Logs Vidéo Scheduler</h3>
+    <button id="refresh-log-video">
+      🔄 Actualiser <span id="status-log-video"></span>
+    </button>
+    <textarea id="log-video" rows="12" readonly style="width:100%; margin-top:0.5rem;"></textarea>
+  </div>
+
+  <div style="margin-top: 0.5rem;">
+    <h3 style="margin-top: 2rem;">📻 Logs Radio Scheduler</h3>
+    <button id="refresh-log-radio">
+      🔄 Actualiser <span id="status-log-radio"></span>
+    </button>
+    <textarea id="log-radio" rows="12" readonly style="width:100%; margin-top:0.5rem;"></textarea>
+  </div>
 </div>
+
+
 
 <div id="Home" style="margin-top: 20px; text-align: center;">
   <button class="tab-button" onclick="location.href='/index'">📻Revenir à la radio</button>

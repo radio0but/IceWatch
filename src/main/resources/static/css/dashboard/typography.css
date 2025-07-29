@@ -1,0 +1,14 @@
+h1, h2 {
+  text-align: center;
+  color: var(--accent);
+}
+
+.status-label {
+  font-weight: bold;
+  margin-left: 0.5rem;
+  color: var(--text);
+}
+
+.status-active { color: #4caf50; }
+.status-inactive { color: #f44336; }
+.status-unknown { color: #ff9800; }

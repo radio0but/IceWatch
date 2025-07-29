@@ -1,0 +1,68 @@
+.schedule-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+}
+
+#schedule-grid {
+  min-width: 960px;
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+  border: 1px solid var(--border);
+  margin-top: 2rem;
+  font-size: 0.85rem;
+}
+
+.schedule-cell, .schedule-header {
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.schedule-header,
+.schedule-row-label {
+  background-color: var(--bg-light);
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.schedule-cell {
+  display: flex;
+  justify-content: space-between;
+  gap: 2px;
+}
+
+.cell-radio, .cell-video {
+  flex: 1;
+  padding: 0.2rem;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+.cell-radio::before { content: "📻 "; }
+.cell-video::before { content: "📺 "; }
+
+.cell-radio.status-live, .cell-video.status-live {
+  background-color: #ff980033;
+  color: #ff9800;
+  font-weight: bold;
+}
+
+.cell-radio.status-auto, .cell-video.status-auto {
+  background-color: #4caf5033;
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.cell-radio.status-empty, .cell-video.status-empty {
+  background-color: #8882;
+  color: #aaa;
+}

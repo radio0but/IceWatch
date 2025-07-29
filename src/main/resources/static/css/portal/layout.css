@@ -1,0 +1,55 @@
+body {
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Inconsolata', monospace;
+  background: 
+    linear-gradient(135deg, rgba(24, 25, 34, 0.9) 40%, rgba(37, 40, 59, 0.2) 100%),
+    url('/background.png') center center / cover no-repeat;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-x: hidden;
+}
+
+#artist-image-container {
+  display: none;
+}
+
+#radio-layout,
+#video-layout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+  flex-wrap: wrap;
+  text-align: initial;
+}
+
+#radio-right > *,
+#video-container > * {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 1024px) {
+  #radio-layout,
+  #video-layout {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  #audio-description,
+  #radio-right,
+  #video-description,
+  #video-container {
+    max-width: 100%;
+  }
+
+  .content-grid {
+    flex-direction: column;
+  }
+}

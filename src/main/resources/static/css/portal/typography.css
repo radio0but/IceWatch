@@ -1,0 +1,33 @@
+h1 {
+  font-weight: 900;
+  letter-spacing: -1px;
+  margin-bottom: 1.5rem;
+  font-size: 2.1rem;
+  user-select: none;
+  color: #fff;
+}
+
+h2 {
+  text-align: center;
+}
+
+p {
+  text-align: center;
+  padding-right: 25px;
+  padding-left: 25px;
+}
+
+.logo-antenna {
+  font-size: 1.5rem;
+  margin-left: 0.3em;
+  vertical-align: -0.2em;
+  opacity: 0.87;
+  filter: drop-shadow(0 0 16px #e53935bb);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { filter: drop-shadow(0 0 8px #e53935bb);}
+  50% { filter: drop-shadow(0 0 24px #e5393588);}
+  100% { filter: drop-shadow(0 0 8px #e53935bb);}
+}

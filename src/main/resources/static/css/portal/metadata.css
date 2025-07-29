@@ -1,0 +1,32 @@
+#metadata-box {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  max-width: 400px;
+  text-align: center;
+  backdrop-filter: blur(5px);
+}
+
+#metadata-box img {
+  max-height: 200px;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+#metadata-box p {
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+}
+
+#metadata {
+  transition: opacity 0.5s ease-in-out;
+}
+
+.fade-out {
+  opacity: 0;
+}
+
+.fade-in {
+  opacity: 1;
+}

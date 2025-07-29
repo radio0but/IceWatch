@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap');
+
+:root {
+  --accent: #e53935;
+  --bg: #0e0e0e;
+  --bg-light: #1a1a1a;
+  --text: #eee;
+  --border: #444;
+  --button-bg: #ce2927;
+  --button-hover: #e53935;
+  --font: 'Segoe UI', sans-serif;
+}

@@ -1,0 +1,45 @@
+.button-logout {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 13px;
+  padding: 0.7em 1.3em;
+  font-size: 1.08rem;
+  font-weight: bold;
+  font-family: 'Inconsolata', monospace;
+  text-decoration: none;
+  margin-bottom: 1.1em;
+  box-shadow: 0 2px 8px 0 rgba(229,57,53,0.13);
+  transition: background 0.2s, transform 0.1s;
+  display: inline-block;
+}
+
+.button-logout:hover,
+.button-logout:focus {
+  background: #ff5050;
+  transform: translateY(-2px) scale(1.025);
+}
+
+.button-toggle {
+  margin-top: 1rem;
+  background-color: #222;
+  color: #fff;
+  border: 1px solid #666;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button-toggle:hover {
+  background-color: #444;
+}
+
+@media (max-width: 1024px) {
+  .tab-button,
+  .button-logout {
+    font-size: 2rem;
+    border-radius: 20px;
+    width: 90vw;
+  }
+}

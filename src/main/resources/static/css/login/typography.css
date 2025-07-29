@@ -1,0 +1,41 @@
+h1 {
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  user-select: none;
+}
+
+.accent {
+  color: var(--accent);
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+.logo-antenna {
+  font-size: 1.5rem;
+  margin-left: 0.3em;
+  vertical-align: -0.2em;
+  opacity: 0.87;
+  filter: drop-shadow(0 0 16px #e53935bb);
+  animation: pulse 2s infinite;
+}
+
+@media (max-width: 1024px) {
+  h1 {
+    font-size: 4.5rem;
+    margin-bottom: 3.5rem;
+  }
+
+  .logo-antenna {
+    font-size: 6.2rem;
+    margin-left: 0.4em;
+    vertical-align: -0.23em;
+  }
+}
+
+@keyframes pulse {
+  0% { filter: drop-shadow(0 0 8px #e53935bb);}
+  50% { filter: drop-shadow(0 0 24px #e5393588);}
+  100% { filter: drop-shadow(0 0 8px #e53935bb);}
+}

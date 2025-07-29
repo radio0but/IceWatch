@@ -1,0 +1,28 @@
+form {
+  max-width: 400px;
+  margin: 2rem auto;
+  background-color: var(--bg-light);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #0004;
+}
+
+input, select, button, textarea {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  background-color: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+textarea#properties-editor {
+  padding: 1rem;
+  border-radius: 6px;
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.95rem;
+  resize: vertical;
+  box-sizing: border-box;
+}

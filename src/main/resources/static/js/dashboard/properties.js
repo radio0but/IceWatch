@@ -50,6 +50,29 @@ export async function loadLog(type) {
     }
   }
 }
+export async function restartVideoScheduler() {
+  try {
+    await fetch("/admin/settings/restart-video-scheduler", { method: "POST" });
+    alert("Vidéo Scheduler redémarré.");
+  } catch (error) {
+    alert("Erreur redémarrage vidéo scheduler : " + error.message);
+  }
+}
 
-window.loadLog = loadLog;
+export async function restartRadioScheduler() {
+  try {
+    await fetch("/admin/settings/restart-radio-scheduler", { method: "POST" });
+    alert("Radio Scheduler redémarré.");
+  } catch (error) {
+    alert("Erreur redémarrage radio scheduler : " + error.message);
+  }
+}
 
+export async function resetAppearance() {
+  try {
+    await fetch("/admin/settings/reset", { method: "POST" });
+    alert("Apparence réinitialisée.");
+  } catch (error) {
+    alert("Erreur lors de la réinitialisation : " + error.message);
+  }
+}

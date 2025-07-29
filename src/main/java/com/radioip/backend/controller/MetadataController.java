@@ -51,7 +51,7 @@ public class MetadataController {
 
             String json;
             try (InputStream inputStream = conn.getInputStream()) {
-                json = new String(inputStream.readAllBytes());
+                json = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
             }
             conn.disconnect();
 

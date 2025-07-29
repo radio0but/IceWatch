@@ -1,0 +1,24 @@
+button {
+  background-color: var(--button-bg);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  height: fit-content;
+}
+
+button:hover {
+  background-color: var(--button-hover);
+}
+
+button.danger {
+  background-color: #b71c1c;
+  font-weight: bold;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+button.danger:hover {
+  background-color: #e53935;
+  transform: scale(1.02);
+  box-shadow: 0 0 8px rgba(255, 0, 0, 0.4);
+}

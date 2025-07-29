@@ -1,0 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap');
+
+:root {
+  --background: linear-gradient(135deg, #181922ee 40%, #25283bcc 100%);
+  --glass: rgba(28, 28, 36, 0.94);
+  --accent: #e53935;
+  --text: #f0f0f0;
+}
