@@ -1,0 +1,33 @@
+.custom-player {
+  background: rgba(28, 28, 36, 0.9);
+  padding: 1rem 1.5rem;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+  max-width: 500px;
+  margin: 1.5rem auto;
+  font-family: 'Inconsolata', monospace;
+  color: #f0f0f0;
+}
+
+.custom-player button {
+  background: var(--accent);
+  color: white;
+  font-size: 1.4rem;
+  padding: 0.4em 0.7em;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+.custom-player button:hover {
+  background: #ff5050;
+}
+
+.custom-player input[type="range"] {
+  width: 100px;
+}

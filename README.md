@@ -84,76 +84,55 @@ Voir le dossier `docs/` ou la [documentation pédagogique](https://github.com/ra
 
 ---
 
-## 📱 IceWatch – Secure audio/video proxy backend
+## 🇬🇧 English Notice – About IceWatch
 
-**IceWatch** is a secure Spring Boot backend designed to proxy and protect audio/video streams served by **Icecast** and **Owncast**. It provides token-based access control, referer validation, and a secure frontend portal with optional LDAP support.
+**IceWatch** is currently a self-hosted web platform developed **entirely in French**, intended for local radio/video broadcasting in educational or community environments.
 
----
-
-### 🎯 Features
-
-- 🔐 **Token-based access** linked to the `Referer` header
-- 🧾 **Master token** for trusted systems like Omnivox or mobile apps
-- 🛡️ **Built-in reverse proxy** for Owncast and Icecast (1 exposed domain)
-- 🌐 **Custom CORS config** for frontend integration
-- ⚙️ **Centralized config** via `application.properties`
-- 🔑 **Login portal** with LDAP/local authentication
-- 🧑‍💼 **Admin dashboard** with user management and monitoring
-- 🎮 **Owncast Scheduler**: automated video streaming from folder-based schedules
-- 🎧 **Radio Scheduler (Liquidsoap)**: timed audio streaming via folder-based structure
+While the software was initially just a backend proxy for securing Icecast/Owncast streams, it has grown into a complete platform featuring a secured portal, user login (LDAP/local), an admin dashboard, a custom media player, and broadcast scheduling tools.
 
 ---
 
-### 🚀 Quick Install (server)
+### 🔧 How to Use It in English
 
-```bash
-curl -fsSL https://github.com/radio0but/IceWatch/releases/download/v0.0.1/install.sh | bash
-```
+Although the interface and documentation are in French, **you can still use IceWatch in your environment** by:
 
-Installs Icecast, Owncast, Liquidsoap, IceWatch, and configures Samba shares and systemd services.
+1. **Cloning the repository and building the project** manually:
 
----
+   ```bash
+   git clone https://github.com/radio0but/IceWatch.git
+   cd IceWatch
+   mvn clean package
+   ```
 
-### 🚤 Client Setup (Manjaro KDE)
+   This will generate `icewatch.jar`.
 
-```bash
-bash <(curl -fsSL https://github.com/radio0but/IceWatch/releases/download/v0.0.1/InstallApps.sh) --plasma
-```
+2. **Running the install script** to deploy dependencies:
 
-This installs and configures:
+   ```bash
+   curl -fsSL https://github.com/radio0but/IceWatch/releases/download/v0.0.1/install.sh | bash
+   ```
 
-- Audio/video tools (Mixxx, OBS, QjackCtl, Kdenlive...)
-- Plasma visual settings (optional)
-- Mounts `~/radioemissions` automatically
+   Then, replace the generated JAR with your custom build:
 
-Options:
-
-- `--plasma` = install + Plasma config
-- `--update` = update only
-
----
-
-### 🎵 Radio Scheduler (Liquidsoap)
-
-- Folder structure: `radioemissions/day/hour/`
-- `radio.liq` triggers AutoDJ for a time slot
-- `live` file interrupts AutoDJ for live shows
-- Runs in background via `run.sh` (systemd)
+   ```bash
+   sudo mv target/icewatch.jar /opt/icewatch/
+   sudo systemctl restart icewatch
+   ```
 
 ---
 
-### 🎥 Video Scheduler (Owncast + FFmpeg)
+### 🌍 Want to Translate IceWatch?
 
-- Folders: `/srv/owncast-schedule/Day/Hour/video/`
-- Add `play` to activate scheduled streaming
-- Add `live` to interrupt and allow live OBS stream
-- Script `video-scheduler.sh` runs in background
+The app is hardcoded in French for now, but we welcome help to make it multilingual! If you want to contribute:
 
----
+- Fork the project
+- Create an English translation of the HTML/JS content in `static/`
+- Suggest improvements to structure for language packs
+- Share your version or open a pull request
 
-### 📒 Full Documentation
+We encourage community forks if you'd like to adapt the project for broader use!
 
-See `docs/` or [pedagogical guide](https://github.com/radio0but/IceWatch/wiki) *(in progress)*.
+> 📝 *Note: The current documentation and UI are only available in French for now.*
 
 
 ❤️ Made by Marc-André Legault 2025 — Supporting open-source pedagogy at Cégep Rosemont.
