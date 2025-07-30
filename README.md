@@ -84,6 +84,9 @@ Voir le dossier `docs/` ou la [documentation pédagogique](https://github.com/ra
 
 ---
 
+❤️ Réalisé par Marc-André Legault 2025 — Pour une pédagogie libre et open-source au Cégep Rosemont.
+
+
 ## 🇬🇧 English Notice – About IceWatch
 
 **IceWatch** is currently a self-hosted web platform developed **entirely in French**, intended for local radio/video broadcasting in educational or community environments.
@@ -92,7 +95,7 @@ While the software was initially just a backend proxy for securing Icecast/Ownca
 
 ---
 
-### 🔧 How to Use It in English
+### 🔧 How to Use IceWatch in Your Language
 
 Although the interface and documentation are in French, **you can still use IceWatch in your environment** by:
 
@@ -104,7 +107,7 @@ Although the interface and documentation are in French, **you can still use IceW
    mvn clean package
    ```
 
-   This will generate `icewatch.jar`.
+   This will generate the file `./target/icewatch.jar`.
 
 2. **Running the install script** to deploy dependencies:
 
@@ -121,7 +124,7 @@ Although the interface and documentation are in French, **you can still use IceW
 
 ---
 
-### 🌍 Want to Translate IceWatch?
+### 🌍 Want to Translate or Adapt IceWatch?
 
 The app is hardcoded in French for now, but we welcome help to make it multilingual! If you want to contribute:
 
@@ -132,7 +135,16 @@ The app is hardcoded in French for now, but we welcome help to make it multiling
 
 We encourage community forks if you'd like to adapt the project for broader use!
 
+In the meantime, if you want to translate IceWatch manually, here are the files where most user-facing text is defined:
+
+- Frontend HTML/JS: located in `src/main/resources/static/`
+- Server-rendered pages: see `StaticPageController.java`
+- Default appearance text (titles, messages): can be edited directly through the admin dashboard
+
+You can duplicate and translate these manually while we work on a future internationalization system.
+
 > 📝 *Note: The current documentation and UI are only available in French for now.*
+
 
 
 ❤️ Made by Marc-André Legault 2025 — Supporting open-source pedagogy at Cégep Rosemont.
