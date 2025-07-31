@@ -13,10 +13,7 @@ if (audioInfo) {
   if (old) {
     const container = document.createElement("div");
     container.id = "audio-description";
-    container.style.marginBottom = "1rem";
-    container.style.padding = "0.5rem";
-    container.style.background = "#222";
-    container.style.borderRadius = "0.5rem";
+    container.className = "description-box audio-description";
 
     container.innerHTML = `
       <h3 style="margin-top:0;">ℹ️ Émission Radio</h3>
@@ -27,17 +24,12 @@ if (audioInfo) {
   }
 }
 
-
-// Description vidéo (télévision)
 if (videoInfo) {
   const old = document.querySelector("#video-layout #video-description");
   if (old) {
     const container = document.createElement("div");
     container.id = "video-description";
-    container.style.marginBottom = "1rem";
-    container.style.padding = "0.5rem";
-    container.style.background = "#222";
-    container.style.borderRadius = "0.5rem";
+    container.className = "description-box video-description";
 
     container.innerHTML = `
       <h3 style="margin-top:0;">ℹ️ Émission Télévision</h3>

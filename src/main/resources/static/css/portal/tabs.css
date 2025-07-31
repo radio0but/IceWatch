@@ -6,7 +6,7 @@
 }
 
 .tab-button {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.7);
   color: var(--text);
   border: 2px solid var(--accent);
   border-radius: 12px;

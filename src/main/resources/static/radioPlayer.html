@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lecteur Radio</title>
+  <link rel="stylesheet" href="/css/components/radioPlayer.css" />
+  <style>
+    html, body {
+      margin: 0;
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+  <div id="player-container">Chargement...</div>
+  <script type="module">
+    import { initCustomAudioPlayer } from "/js/components/radioPlayer.js";
+    initCustomAudioPlayer();
+  </script>
+</body>
+</html>

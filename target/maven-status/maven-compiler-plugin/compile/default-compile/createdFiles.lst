@@ -22,9 +22,11 @@ com/radioip/backend/config/Security_Config.class
 com/radioip/backend/controller/MetadataController.class
 com/radioip/backend/controller/RSSController.class
 com/radioip/backend/repository/SlotInfoRepository.class
+com/radioip/backend/controller/RadioPlayerController.class
 com/radioip/backend/controller/AuthController.class
 com/radioip/backend/model/SlotInfo.class
 com/radioip/backend/config/AppearanceConfig.class
 com/radioip/backend/config/CorsConfig.class
 com/radioip/backend/controller/AdminUserController.class
 com/radioip/backend/service/ArtistImageService.class
+com/radioip/backend/config/StaticResourceConfig.class

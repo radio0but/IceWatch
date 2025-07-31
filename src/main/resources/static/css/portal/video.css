@@ -8,6 +8,9 @@
 #video-container iframe {
   width: 550px;
   height: 350px;
+  border: inset;
+  border-color: crimson;
+  border-width: thick;
   border-radius: 13px;
   border: none;
   background: #1a1c22;

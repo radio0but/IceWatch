@@ -1,5 +1,4 @@
-import { fetchApiBase, fetchToken } from "./player.js";
-import { setupAudio, setupVideo } from "./player.js";
+import { fetchApiBase, fetchToken, setupVideo } from "./player.js";
 import { updateMetadata, startAutoScrollAfterDelay } from "./metadata.js";
 import { initJournalRSS } from "./rss.js";
 import { setupTabs } from "./tabs.js";
@@ -8,28 +7,35 @@ import { loadEmissionDescriptions } from "./emission.js";
 window.addEventListener("DOMContentLoaded", async () => {
   try {
     await fetchApiBase();
-    const token = await fetchToken();
-    await setupAudio(token);
+
+    // === AUDIO ===
+    const { initCustomAudioPlayer } = await import("./radioPlayer.js");
+    await initCustomAudioPlayer();
+
+    // === VIDEO ===
+    const token = await fetchToken(); // important pour la vidéo
     await setupVideo(token);
+
+    // === Autres modules ===
     updateMetadata();
     startAutoScrollAfterDelay();
     await initJournalRSS();
-    await loadEmissionDescriptions(); // <== ici
+    await loadEmissionDescriptions();
   } catch (err) {
     console.error("Erreur d'initialisation :", err);
-    document.getElementById("player-container").innerText = "Erreur de lecture audio.";
-    document.getElementById("video-container").innerText = "Erreur de lecture vidéo.";
+    document.getElementById("player-container").innerText = "❌ Erreur de lecture audio.";
+    document.getElementById("video-container").innerText = "❌ Erreur de lecture vidéo.";
   }
 
   setInterval(updateMetadata, 15000);
   setupTabs();
   showAdminLinkIfNeeded();
 });
+
 export async function showAdminLinkIfNeeded() {
   try {
     const res = await fetch("/auth/me");
     const user = await res.json();
-
     if (user.role === "ADMIN") {
       document.getElementById("admin-link").style.display = "block";
     }
@@ -37,4 +43,3 @@ export async function showAdminLinkIfNeeded() {
     console.warn("Impossible de vérifier le rôle de l'utilisateur.");
   }
 }
-

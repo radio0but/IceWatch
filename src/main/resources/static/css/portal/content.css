@@ -13,3 +13,46 @@
   max-width: 550px;
   width: 100%;
 }
+
+/* === Description Box (commun audio + vidéo) === */
+.description-box {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0.75rem;
+  color: #f0f0f0;
+  font-family: 'Inconsolata', monospace;
+  line-height: 1.6;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+.description-box h3 {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.description-box ul {
+  padding-left: 1.2rem;
+  margin: 0.5rem 0;
+}
+
+.description-box li {
+  margin-bottom: 0.5rem;
+}
+
+.description-box a {
+  color: #56b2ff;
+  text-decoration: underline;
+}
+
+.description-box blockquote {
+  margin: 1rem 0;
+  padding-left: 1rem;
+  border-left: 3px solid #888;
+  color: #ccc;
+  font-style: italic;
+}
+
+/* === Modificateurs === */
+.audio-description {}
+.video-description {}
