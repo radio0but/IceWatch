@@ -40,7 +40,7 @@
           <button id="next-button" class="carousel-button"><img src="/droite.png" alt="▶️"></button>
         </div>
       </div>
-       <div id="custom-html">${custom.html}</div>
+       
     </div>
   </div>
 </div>
@@ -53,14 +53,15 @@
     <!-- Colonne droite : vidéo + custom HTML -->
     <div class="video-side">
       <div id="video-container">Chargement du lecteur vidéo…</div>
-      <div id="custom-html">${custom.html}</div>
     </div>
   </div>
 </div>
 
   ${journal.tab}
   ${logout.tab}
-
+<div id="custom-html-global">
+  <div id="custom-html">${custom.html}</div>
+</div>
 <script type="module" src="/js/portal/index.js"></script>
 
 </body>

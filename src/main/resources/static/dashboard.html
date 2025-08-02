@@ -1,27 +1,88 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <link rel="icon" type="image/png" href="${favicon}">
-    <meta charset="UTF-8">
-    <title>Tableau de bord - Administration Radio</title>
-    <link rel="stylesheet" href="/css/dashboard/index.css">
-    <style>${custom.css}</style>
+  <meta charset="UTF-8" />
+  <title>Tableau de bord - Administration Radio</title>
+  <link rel="icon" type="image/png" href="${favicon}">
+  <link rel="stylesheet" href="/css/dashboard/index.css">
+  <style>${custom.css}</style>
 </head>
 <body>
-<h1>Tableau de bord - Administration Radio</h1>
 
-<div class="tabs">
-    <button class="tab-button active" data-tab="slots">📅 Créneaux</button>
-    <button class="tab-button" data-tab="rss">🗞️ Journal</button>
-    <button class="tab-button" data-tab="users">👥 Utilisateurs</button>
-    <button class="tab-button" data-tab="appearance">🧑‍🎨 Personnalisation</button>
-    <button class="tab-button" data-tab="maintenance">🛠️ Maintenance</button>
+<!-- === Layout principal === -->
+<div class="dashboard-layout">
 
+  <!-- === Sidebar === -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <button id="sidebar-toggle">≡</button>
+      <span class="radio-title">${radio.title}</span>
+    </div>
+    <nav class="sidebar-nav">
+      <!-- <button data-tab="status" data-label="📈">📈 État</button> -->
+      <button data-tab="slots" data-label="📅">📅 Créneaux</button>
+      <button data-tab="rss" data-label="🗞️">🗞️ Journal</button>
+      <button data-tab="users" data-label="👥">👥 Utilisateurs</button>
+      <button data-tab="appearance" data-label="🎨">🎨 Personnalisation</button>
+      <button data-tab="maintenance" data-label="🛠️">🛠️ Maintenance</button>
 
+    </nav>
+  </aside>
+
+  <!-- === Contenu principal === -->
+  <div class="main-area">
+    <!-- === Topbar === -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <span id="stream-status" style="margin-left: 1rem;">🔄 Chargement…</span>
+        <span id="clock" style="margin-left: auto; font-weight: bold;"></span>
+      </div>
+      <div class="topbar-center">
+        <h1>Tableau de bord - Administration Radio</h1>
+      </div>
+      <div class="topbar-right">
+        <!-- Voyants audio/vidéo ici plus tard -->
+        <button onclick="location.href='/index'">🔙 Revenir à la radio</button>
+      </div>
+    </header>
+
+    <!-- === Contenu dynamique injecté ici === -->
+    <main id="main-content">
+      <!-- Toutes les sections existantes ici -->
+      <!-- <div id="tab-status" class="tab-content">📈 (Section état — à créer)</div> -->
+<div id="tab-slots" class="tab-content">
+  <h2>Planning des créneaux</h2>
+
+  <p style="margin-top: -0.5rem; max-width: 800px; line-height: 1.6;">
+    Le planning ci-dessous affiche les contenus prévus pour chaque heure, que ce soit pour la radio 🎧 ou la télévision 📺.
+    Les créneaux peuvent être vides ⚪, automatiques ⚙️ (lecture planifiée) ou en direct 🔴.
+    <br><br>
+    Les fichiers doivent être placés dans les dossiers locaux accessibles uniquement depuis les ordinateurs du <strong>studio</strong> ou de la <strong>salle Muse</strong>.
+  </p>
+
+  <ul style="margin-top: 0; margin-bottom: 1.5rem; line-height: 1.5;">
+    <li>🎧 <code>~/radioemissions/&lt;jour&gt;/&lt;heure&gt;/</code></li>
+    <li>📺 <code>~/owncastvideos/&lt;N&gt;&lt;Jour&gt;/&lt;heure&gt;/</code> (ex. <code>4Mercredi/14</code>)</li>
+  </ul>
+
+  <div class="legend">
+    <span>📻 = Radio</span>
+    <span>📺 = Vidéo</span>
+    <span class="status-live">🔴 En direct</span>
+    <span class="status-auto">⚙️ Automatique</span>
+    <span class="status-empty">⚪ Vide</span>
+  </div>
+
+  <div class="schedule-wrapper">
+    <div id="schedule-grid">
+      <!-- La grille sera générée en JS -->
+    </div>
+    <div id="slot-details" style="display: none;"></div>
+
+  </div>
 </div>
 
-<!-- Onglet Journal -->
-<div id="tab-rss" class="tab-content">
+      <div id="tab-rss" class="tab-content">
   <h2>🗞️ Journal étudiant (via flux RSS)</h2>
 
   <p>Ce module permet d’afficher automatiquement les derniers articles d’un journal étudiant externe (ex: WordPress) dans la page d’accueil.</p>
@@ -33,46 +94,43 @@
     <button onclick="testRSS()">🔍 Tester le lien</button>
     <button onclick="saveRSS()">💾 Enregistrer</button>
     <div style="margin-top: 1rem;">
-  <label>
-    <input type="checkbox" id="rss-show-images" />
-    🖼️ Afficher les images des articles RSS
-  </label>
-</div>
+      <label>
+        <input type="checkbox" id="rss-show-images" />
+        🖼️ Afficher les images des articles RSS
+      </label>
+    </div>
     <span id="rss-status" style="align-self: center;"></span>
   </div>
 </div>
 
+      <div id="tab-users" class="tab-content">
+  <h2>Gestion des utilisateurs</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Nom d'utilisateur</th>
+        <th>Rôles</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="user-list">
+      <!-- Rempli dynamiquement -->
+    </tbody>
+  </table>
 
-<!-- Onglet Utilisateurs -->
-<div id="tab-users" class="tab-content active">
-    <h2>Gestion des utilisateurs</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Nom d'utilisateur</th>
-                <th>Rôles</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody id="user-list">
-            <!-- Rempli dynamiquement -->
-        </tbody>
-    </table>
-
-    <form action="/admin/create" method="post">
-        <h3>Créer un nouvel utilisateur</h3>
-        <input type="text" name="username" placeholder="Nom d'utilisateur" required />
-        <input type="password" name="password" placeholder="Mot de passe" required />
-        <select name="role">
-            <option value="USER">Utilisateur</option>
-            <option value="ADMIN">Administrateur</option>
-        </select>
-        <button type="submit">Créer</button>
-    </form>
+  <form action="/admin/create" method="post">
+    <h3>Créer un nouvel utilisateur</h3>
+    <input type="text" name="username" placeholder="Nom d'utilisateur" required />
+    <input type="password" name="password" placeholder="Mot de passe" required />
+    <select name="role">
+      <option value="USER">Utilisateur</option>
+      <option value="ADMIN">Administrateur</option>
+    </select>
+    <button type="submit">Créer</button>
+  </form>
 </div>
 
-<!-- Onglet Paramètres -->
-<div id="tab-appearance" class="tab-content">
+      <div id="tab-appearance" class="tab-content">
   <h2>🧑‍🎨 Personnalisation de l’apparence</h2>
 
   <p>
@@ -88,35 +146,35 @@
   </p>
 
   <textarea id="properties-editor" rows="15" style="width:100%;"></textarea>
-  <button id="save-button">📎 Enregistrer</button>
-  <button id="reset-button" class="danger">♻️ Réinitialiser Apparence</button>
+<!-- Boutons regroupés -->
+<div style="display: flex; flex-wrap: wrap; gap: 2rem; margin-top: 1rem;">
+
+  <!-- Box 1 : Calepin / Import / Export -->
+  <div style="background-color: rgba(0, 0, 0, 0.5); padding: 1rem; border-radius: 8px; display: flex; gap: 1rem; flex-wrap: wrap;">
+    <button id="append-to-notes">📝 Ajouter au calepin</button>
+    <button id="export-properties">📤 Exporter (.look)</button>
+   <input type="file" id="import-properties" accept=".look" style="display: none;">
+    <button id="import-button">📥 Importer (.look)</button>
+
+  </div>
+
+  <!-- Box 2 : Enregistrer / Réinitialiser -->
+  <div style="background-color: rgba(0, 0, 0, 0.5); padding: 1rem; border-radius: 8px; display: flex; gap: 1rem;">
+    <button id="save-button">💾 Appliquer</button>
+    <button id="reset-button" class="danger">♻️ Réinitialiser Apparence</button>
+  </div>
+
+</div>
+
 
   <h3>📝 Calepin de notes</h3>
   <p style="margin-top: -0.5rem;">
     Utilisez cet espace pour conserver des notes sur vos thèmes, configurations ou commentaires techniques. Les modifications sont sauvegardées automatiquement.
   </p>
-  <textarea id="appearance-notes" rows="8" style="width:100%; resize:vertical; font-family:monospace;" placeholder="Vos notes ici…">\${notes}</textarea>
-</div>
-<!-- Onglet Créneaux -->
-<!-- Onglet Créneaux -->
-<div id="tab-slots" class="tab-content">
-    <h2>Planning des créneaux</h2>
-    <div class="legend">
-        <span>📻 = Radio</span>
-        <span>📺 = Vidéo</span>
-        <span class="status-live">🔴 En direct</span>
-        <span class="status-auto">⚙️ Automatique</span>
-        <span class="status-empty">⚪ Vide</span>
-    </div>
-    <div class="schedule-wrapper">
-  <div id="schedule-grid">
-      <!-- La grille sera générée en JS -->
-  </div>
-</div>
+  <textarea id="appearance-notes" rows="8" style="width:100%; resize:vertical; font-family:monospace;" placeholder="Vos notes ici…">${notes}</textarea>
 </div>
 
-<!-- Onglet Redémarrage -->
-<div id="tab-maintenance" class="tab-content">
+      <div id="tab-maintenance" class="tab-content">
   <h2>Redémarrer IceWatch & Schedulers</h2>
   <p>Utilisez ces boutons pour redémarrer les services.</p>
 
@@ -148,12 +206,33 @@
   </div>
 </div>
 
-
-
-<div id="Home" style="margin-top: 20px; text-align: center;">
-  <button class="tab-button" onclick="location.href='/index'">📻Revenir à la radio</button>
+    </main>
+  </div>
 </div>
+<!-- === Onglet de prévisualisation du portail === -->
+<div id="preview-toggle">👀</div>
 
+<div id="preview-panel">
+  <div id="preview-resize-handle"></div> <!-- ← poignée ici -->
+
+
+  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: #222; border-bottom: 1px solid var(--border);">
+    <span style="color: var(--accent); font-weight: bold;">🔎 Prévisualisation du portail</span>
+    <div id="preview-test-toolbar" style="background:#111; padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); display:flex; gap:1rem; align-items: center;">
+      <span style="color:#f1f1f1;">🧪 Test interface :</span>
+      <label style="color:white;"><input type="checkbox" id="toggle-preview-rss" checked> 🗞️ Journal</label>
+      <label style="color:white;"><input type="checkbox" id="toggle-preview-logout" checked> 🔓 Déconnexion</label>
+      <label style="color:white;"><input type="checkbox" id="toggle-preview-description" checked> 📝 Descriptions</label>
+      <label style="color:white;"><input type="checkbox" id="toggle-preview-html" checked> 🧩 Contenu HTML</label>
+
+    </div>
+    <div>
+      <button id="preview-refresh">🔁</button>
+      <button id="preview-close">❌</button>
+    </div>
+  </div>
+  <iframe id="preview-iframe" src="/index"></iframe>
+</div>
 <script type="module" src="/js/dashboard/index.js"></script>
 </body>
 </html>

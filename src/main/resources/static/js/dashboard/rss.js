@@ -52,3 +52,5 @@ export async function saveRSS() {
     alert("Erreur d’enregistrement.");
   }
 }
+window.testRSS = testRSS;
+window.saveRSS = saveRSS;

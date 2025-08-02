@@ -1,4 +1,5 @@
 com/radioip/backend/repository/SettingRepository.class
+com/radioip/backend/service/EmissionService.class
 com/radioip/backend/model/LocalUser.class
 com/radioip/backend/controller/AdminSettingsController.class
 com/radioip/backend/service/AppearanceService.class

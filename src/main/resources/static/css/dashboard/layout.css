@@ -10,13 +10,233 @@ body {
   color: var(--text);
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: flex-start;
   overflow-x: hidden;
 }
 
-@media (max-width: 600px) {
-  body {
-    padding: 1rem;
-  }
+/* === Layout principal === */
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg);
+}
+
+/* === Sidebar === */
+.sidebar {
+  width: 240px;
+  background-color: #111;
+  color: #eee;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.2s ease;
+  border-right: 1px solid var(--border);
+}
+
+.sidebar .sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-right: 2rem;
+  border-bottom: 1px solid var(--border);
+  font-weight: bold;
+}
+
+.sidebar .sidebar-header button {
+  background: none;
+  color: #eee;
+  font-size: 1.5rem;
+  border: none;
+  cursor: pointer;
+  padding-top: 1rem;
+  
+}
+
+.sidebar .radio-title {
+  font-size: 1.2rem;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.sidebar-nav button {
+  background: none;
+  border: none;
+  color: #eee;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.sidebar-nav button:hover,
+.sidebar-nav button.active {
+  background-color: #333;
+}
+
+/* === Replié === */
+body.sidebar-collapsed .sidebar {
+  width: 64px;
+}
+
+body.sidebar-collapsed .sidebar .radio-title {
+  display: none;
+}
+
+body.sidebar-collapsed .sidebar-nav button {
+  text-align: center;
+  padding: 0.75rem 0;
+  font-size: 1.25rem;
+  font-size: 0; /* cache le texte */
+  padding: 0.75rem 0;
+}
+
+body.sidebar-collapsed .sidebar-nav button::before {
+  font-size: 1.25rem; /* les emojis restent visibles */
+  display: inline-block;
+}
+
+.sidebar-nav button::before {
+  content: attr(data-label);
+  display: none;
+}
+/* === Topbar === */
+.topbar {
+  height: 64px;
+  background-color: #1a1a1a;
+  color: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.topbar-left,
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.topbar button {
+  background-color: var(--button-bg);
+  color: white;
+  border: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* ← ESSENTIEL pour que les enfants puissent shrink */
+  background: linear-gradient(135deg, rgba(24, 25, 34, 0.9) 40%, rgba(37, 40, 59, 0.2) 100%), url(/background.png) center center / cover no-repeat;
+}
+
+#main-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+/* === Onglets dynamiques === */
+.tab-content {
+  display: none;
+  background-color: #000000bd;
+}
+
+.tab-content.active {
+  display: block;
+  background-color: #000000bd;
+}
+
+/* === Onglet flottant à droite === */
+#preview-toggle {
+  position: fixed;
+  top: 50%;
+  right: -12px; /* distance du bord droit : largeur du #preview-panel */
+  transform: translateY(-50%);
+  background: var(--accent);
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 6px 0 0 6px; /* coin arrondi à gauche */
+  font-weight: bold;
+  z-index: 10000;
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(0,0,0,0.4);
+}
+/* === Panneau flottant === */
+#preview-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 420px;
+  height: 100vh;
+  background-color: #111;
+  border-left: 2px solid var(--border);
+  display: none;
+  flex-direction: column;
+  z-index: 9998;
+  box-shadow: -4px 0 10px rgba(0,0,0,0.6);
+}
+
+#preview-panel iframe {
+  flex: 1;
+  width: 100%;
+  border: none;
+}
+
+#preview-panel button {
+  background-color: var(--button-bg);
+  border: none;
+  color: white;
+  font-size: 1rem;
+  padding: 0.3rem 0.6rem;
+  margin-left: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+#preview-resize-handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  cursor: ew-resize;
+  background: transparent;
+  z-index: 10000;
+}
+
+.markdown-preview {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #ddd;
+  margin-bottom: 4rem;
+}
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+.markdown-preview p {
+  margin: 0.5rem 0;
 }

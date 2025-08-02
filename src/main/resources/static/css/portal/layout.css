@@ -35,21 +35,70 @@ body {
   margin-right: auto;
 }
 
+#custom-html-global {
+  max-width: 720px;
+}
+
+
 @media (max-width: 1024px) {
   #radio-layout,
   #video-layout {
+    display: flex;
     flex-direction: column;
+    align-items: anchor-center;
     gap: 1.5rem;
   }
 
+  /* ✅ Ordre vertical pour radio */
+  #radio-layout #player-container {
+    order: 1;
+  }
+
+  #radio-layout #metadata {
+    order: 2;
+  }
+
+  #radio-layout #audio-description {
+    order: 3;
+  }
+
+  #radio-layout #custom-html {
+    order: 4;
+  }
+
+  /* ✅ Ordre vertical pour vidéo */
+  #video-layout #video-container {
+    order: 1;
+  }
+
+  #video-layout #metadata {
+    order: 2;
+  }
+
+  #video-layout #video-description {
+    order: 3;
+  }
+
+  #video-layout #custom-html {
+    order: 4;
+  }
+
+  /* Layouts généraux */
   #audio-description,
   #radio-right,
   #video-description,
   #video-container {
     max-width: 100%;
+    align-self: center;
   }
 
   .content-grid {
     flex-direction: column;
   }
+    #custom-html-global {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    padding: 0.5rem;
+  }
 }
+

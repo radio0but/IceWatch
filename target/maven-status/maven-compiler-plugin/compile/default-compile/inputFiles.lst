@@ -18,6 +18,7 @@
 /home/uldarik/.config/IceWatch/src/main/java/com/repository/AppearanceSettingsRepository.java
 /home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/controller/MetadataController.java
 /home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/controller/ScheduleStatusController.java
+/home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/service/EmissionService.java
 /home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/RadioBackendApplication.java
 /home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/config/Security_Config.java
 /home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/config/IceWatchConfig.java

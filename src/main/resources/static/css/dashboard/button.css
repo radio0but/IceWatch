@@ -14,13 +14,18 @@ button:hover {
 }
 
 button.danger {
-  background-color: #b71c1c;
+  background-color: #fff176; /* jaune clair */
   font-weight: bold;
+  color: #333;
+  border: 2px solid #fbc02d; /* jaune foncé */
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 button.danger:hover {
-  background-color: #e53935;
-  transform: scale(1.02);
-  box-shadow: 0 0 8px rgba(255, 0, 0, 0.4);
+  background-color: #fbc02d; /* jaune vif */
+  transform: scale(1.03);
+  border-color: #fffde7; /* très pâle */
+  color: #111;
+  box-shadow: 0 0 8px rgba(255, 221, 51, 0.4);
 }
+

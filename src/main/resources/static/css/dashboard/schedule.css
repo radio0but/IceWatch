@@ -23,7 +23,7 @@
 
 .schedule-header,
 .schedule-row-label {
-  background-color: var(--bg-light);
+  background-color: #000000e8;
   font-weight: bold;
   text-transform: uppercase;
 }
@@ -65,6 +65,119 @@
 }
 
 .cell-radio.status-empty, .cell-video.status-empty {
-  background-color: #8882;
+  background-color: #0a386363;
   color: #aaa;
+}
+#slot-details {
+  background: var(--bg);
+  padding: 1rem;
+  font-family: monospace;
+}
+
+.slot-toolbar {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.slot-toolbar button {
+  padding: 0.5rem;
+  background: var(--button-bg);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.slot-content textarea {
+  width: 100%;
+  background: #222;
+  color: #eee;
+  border: 1px solid #444;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  font-family: monospace;
+  resize: vertical;
+}
+#slot-details {
+  display: none;
+  padding: 1.5rem;
+  animation: fadeIn 0.3s ease-in-out;
+  background: #00000078;
+}
+
+.slot-toolbar {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+.slot-toolbar button {
+  padding: 0.3rem 0.6rem;
+  font-size: 1.1rem;
+  background-color: var(--bg-light);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.slot-toolbar button:hover {
+  background-color: var(--bg-hover);
+}
+
+.slot-content {
+  margin-top: 1rem;
+}
+
+.slot-content textarea {
+  width: 100%;
+  resize: vertical;
+  background-color: var(--bg-light);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 0.5rem;
+  font-family: monospace;
+  margin-bottom: 1rem;
+}
+
+#slot-details code {
+  background: var(--bg-light);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+#slot-details button {
+  margin-left: 0.5rem;
+  cursor: pointer;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.2rem 0.6rem;
+  font-size: 1rem;
+  border-radius: 3px;
+}
+#slot-details button:hover {
+  background: var(--accent-hover, #1e88e5);
+}
+
+#folder-warning {
+  margin-top: 0.5rem;
+  font-style: italic;
+  color: #ff9800;
+}
+#local-paths code.copied {
+  background: #4caf50;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }

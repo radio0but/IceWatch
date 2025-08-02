@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
 import java.util.Map;
 import java.util.Optional;
 
@@ -45,29 +47,28 @@ public class SlotInfoController {
         return ResponseEntity.ok().build();
     }
 
-@GetMapping("/current")
-public ResponseEntity<Map<String, String>> getCurrentSlotInfo() {
-    var now = java.time.ZonedDateTime.now(java.time.ZoneId.of("America/Toronto"));
-    var day = now.getDayOfWeek().name().toLowerCase(); // ex: "sunday"
-    var hour = String.format("%02d", now.getHour());   // ex: "16"
+    @GetMapping("/current")
+    public ResponseEntity<Map<String, String>> getCurrentSlotInfo() {
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Toronto"));
+        String day = now.getDayOfWeek().name().toLowerCase();
+        String hour = String.format("%02d", now.getHour());
 
-    var jours = Map.of(
-        "monday", "lundi",
-        "tuesday", "mardi",
-        "wednesday", "mercredi",
-        "thursday", "jeudi",
-        "friday", "vendredi",
-        "saturday", "samedi",
-        "sunday", "dimanche"
-    );
+        Map<String, String> jours = Map.of(
+            "monday", "lundi",
+            "tuesday", "mardi",
+            "wednesday", "mercredi",
+            "thursday", "jeudi",
+            "friday", "vendredi",
+            "saturday", "samedi",
+            "sunday", "dimanche"
+        );
 
-    String jourFr = jours.getOrDefault(day, day);
-    var opt = repo.findByDayAndHour(jourFr, hour);
+        String jourFr = jours.getOrDefault(day, day);
+        Optional<SlotInfo> opt = repo.findByDayAndHour(jourFr, hour);
 
-    return ResponseEntity.ok(Map.of(
-        "audioInfo", opt.map(SlotInfo::getAudioInfo).orElse(""),
-        "videoInfo", opt.map(SlotInfo::getVideoInfo).orElse("")
-    ));
-}
-
+        return ResponseEntity.ok(Map.of(
+            "audioInfo", opt.map(SlotInfo::getAudioInfo).orElse(""),
+            "videoInfo", opt.map(SlotInfo::getVideoInfo).orElse("")
+        ));
+    }
 }

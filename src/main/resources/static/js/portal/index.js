@@ -33,6 +33,9 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 export async function showAdminLinkIfNeeded() {
+  // Ne rien faire si la page est dans une iframe (ex: aperçu du dashboard)
+  if (window !== window.parent) return;
+
   try {
     const res = await fetch("/auth/me");
     const user = await res.json();
