@@ -1,4 +1,7 @@
 /* css/dashboard/layout.css */
+html, body {
+  height: 100%;
+}
 
 body {
   min-height: 100vh;
@@ -13,109 +16,74 @@ body {
   align-items: stretch;
   justify-content: flex-start;
   overflow-x: hidden;
+  height: 100vh;
+  overflow: hidden; /* IMPORTANT */
 }
 
 /* === Layout principal === */
 .dashboard-layout {
   display: flex;
-  min-height: 100vh;
-  background-color: var(--bg);
+  position: absolute;
+  top: 64px;              /* hauteur de la topbar */
+  left: 240px;            /* largeur de la sidebar */
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;       /* Fait défiler le contenu ici */
 }
 
-/* === Sidebar === */
+
 .sidebar {
-  width: 240px;
-  background-color: #111;
-  color: #eee;
-  display: flex;
-  flex-direction: column;
-  transition: width 0.2s ease;
-  border-right: 1px solid var(--border);
-}
-
-.sidebar .sidebar-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding-right: 2rem;
-  border-bottom: 1px solid var(--border);
-  font-weight: bold;
-}
-
-.sidebar .sidebar-header button {
-  background: none;
-  color: #eee;
-  font-size: 1.5rem;
-  border: none;
-  cursor: pointer;
-  padding-top: 1rem;
-  
-}
-
-.sidebar .radio-title {
-  font-size: 1.2rem;
-}
-
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
+  position: fixed;
+  top: 107px; /* juste en dessous de la topbar */
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.801);
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 100;
+  box-shadow: 4px 0 12px rgba(0,0,0,0.2);
+  height: auto;
+  width: fit-content;
 }
+
 
 .sidebar-nav button {
-  background: none;
-  border: none;
-  color: #eee;
-  text-align: left;
-  padding: 0.75rem 1rem;
-  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
   font-size: 1rem;
+  background: #222;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  color: white;
   cursor: pointer;
+  gap: 0.5rem;
+  width: -webkit-fill-available;
   transition: background 0.2s;
 }
 
 .sidebar-nav button:hover,
 .sidebar-nav button.active {
-  background-color: #333;
+  background-color: var(--accent, #2196f3);
 }
 
-/* === Replié === */
-body.sidebar-collapsed .sidebar {
-  width: 64px;
-}
-
-body.sidebar-collapsed .sidebar .radio-title {
-  display: none;
-}
-
+/* Mode réduit (icônes seulement) */
 body.sidebar-collapsed .sidebar-nav button {
-  text-align: center;
-  padding: 0.75rem 0;
-  font-size: 1.25rem;
-  font-size: 0; /* cache le texte */
-  padding: 0.75rem 0;
+  justify-content: center;
+  font-size: 0;
+  padding: 0.5rem;
 }
 
 body.sidebar-collapsed .sidebar-nav button::before {
-  font-size: 1.25rem; /* les emojis restent visibles */
-  display: inline-block;
+  content: attr(data-label);
+  font-size: 1.5rem;
 }
 
-.sidebar-nav button::before {
-  content: attr(data-label);
-  display: none;
-}
-/* === Topbar === */
-.topbar {
-  height: 64px;
-  background-color: #1a1a1a;
-  color: #eee;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 1.5rem;
-  border-bottom: 1px solid var(--border);
-}
+
 
 .topbar h1 {
   margin: 0;
@@ -137,22 +105,25 @@ body.sidebar-collapsed .sidebar-nav button::before {
   border-radius: 4px;
   font-weight: bold;
   cursor: pointer;
+  position: relative;
+  top: 8px;
 }
 
 .main-area {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-width: 0; /* ← ESSENTIEL pour que les enfants puissent shrink */
-  background: linear-gradient(135deg, rgba(24, 25, 34, 0.9) 40%, rgba(37, 40, 59, 0.2) 100%), url(/background.png) center center / cover no-repeat;
+  min-width: 0;
+  height: 100vh;
+  padding-top: 64px;  /* Décalage de la topbar */
+  overflow: hidden;   /* évite débordement */
 }
-
 #main-content {
   flex: 1;
   padding: 2rem;
-  overflow-y: auto;
   min-width: 0;
 }
+
 
 /* === Onglets dynamiques === */
 .tab-content {
@@ -239,4 +210,78 @@ body.sidebar-collapsed .sidebar-nav button::before {
 }
 .markdown-preview p {
   margin: 0.5rem 0;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* empêche scroll global */
+}
+
+/* La topbar reste fixe */
+.topbar {
+  top: 0;
+  right: 0;
+  height: 64px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #1a1a1a;
+  border-bottom: 1px solid var(--border);
+  padding: 0 1.5rem;
+  position: fixed !important;
+  width: -webkit-fill-available !important;
+}
+.topbar
+ {
+    height: 64px;
+    background-color: #1a1a1a;
+    color: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    border-bottom: 1px solid var(--border);
+    position: fixed;
+    width: -webkit-fill-available;
+}
+
+
+/* Le layout principal (contenu à droite de la sidebar) */
+.dashboard-layout {
+  position: absolute;
+  top: 0px;              /* hauteur de la topbar */
+  left: 188px;            /* largeur de la sidebar */
+  right: 0;
+  bottom: 0;
+  display: flex;
+}
+
+body.sidebar-collapsed .dashboard-layout {
+  left: 74px; /* largeur réduite du sidebar */
+}
+/* Conteneur principal scrollable */
+.main-area {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+}
+
+/* C’est cette zone qui va scroller */
+
+
+.main-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  height: calc(100vh - 64px); /* hauteur de la fenêtre - topbar */
+}
+
+span.radio-title {
+    font-size: xx-large;
+}
+
+span#clock {
+    font-size: x-large;
 }

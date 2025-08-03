@@ -1,23 +1,39 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" style="height: 100%;">
 <head>
   <meta charset="UTF-8" />
   <title>Tableau de bord - Administration Radio</title>
   <link rel="icon" type="image/png" href="${favicon}">
   <link rel="stylesheet" href="/css/dashboard/index.css">
-  <style>${custom.css}</style>
+  <th:block th:if="${custom.css}">
+  <style th:utext="${custom.css}"></style>
+</th:block>
 </head>
-<body>
+<body style="height: 100%;">
+
+
+  <!-- === Topbar (fixe) === -->
+  <header class="topbar">
+  <div class="topbar-left">
+    <button id="sidebar-toggle">≡</button>
+    <span class="radio-title">${radio.title}</span>
+    <span id="clock" style="margin-left: auto; font-weight: bold;"></span>
+    <span id="stream-status" style="margin-left: 1rem;">🔄 Chargement…</span>
+    
+  </div>
+    <div class="topbar-center">
+      <h1>Tableau de bord - Administration Radio</h1>
+    </div>
+    <div class="topbar-right">
+      <button onclick="location.href='/index'">🔙 Revenir à la radio</button>
+    </div>
+  </header>
 
 <!-- === Layout principal === -->
 <div class="dashboard-layout">
-
   <!-- === Sidebar === -->
   <aside class="sidebar">
-    <div class="sidebar-header">
-      <button id="sidebar-toggle">≡</button>
-      <span class="radio-title">${radio.title}</span>
-    </div>
+
     <nav class="sidebar-nav">
       <!-- <button data-tab="status" data-label="📈">📈 État</button> -->
       <button data-tab="slots" data-label="📅">📅 Créneaux</button>
@@ -31,21 +47,6 @@
 
   <!-- === Contenu principal === -->
   <div class="main-area">
-    <!-- === Topbar === -->
-    <header class="topbar">
-      <div class="topbar-left">
-        <span id="stream-status" style="margin-left: 1rem;">🔄 Chargement…</span>
-        <span id="clock" style="margin-left: auto; font-weight: bold;"></span>
-      </div>
-      <div class="topbar-center">
-        <h1>Tableau de bord - Administration Radio</h1>
-      </div>
-      <div class="topbar-right">
-        <!-- Voyants audio/vidéo ici plus tard -->
-        <button onclick="location.href='/index'">🔙 Revenir à la radio</button>
-      </div>
-    </header>
-
     <!-- === Contenu dynamique injecté ici === -->
     <main id="main-content">
       <!-- Toutes les sections existantes ici -->
@@ -204,9 +205,10 @@
     </button>
     <textarea id="log-radio" rows="12" readonly style="width:100%; margin-top:0.5rem;"></textarea>
   </div>
-</div>
+
 
     </main>
+    </div>
   </div>
 </div>
 <!-- === Onglet de prévisualisation du portail === -->
