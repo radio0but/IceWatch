@@ -28,6 +28,7 @@
 /home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/config/StaticResourceConfig.java
 /home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/model/Setting.java
 /home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/controller/RSSController.java
+/home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/security/LoginRateLimitFilter.java
 /home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/controller/StaticPageController.java
 /home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/service/MetadataService.java
 /home/uldarik/.config/IceWatch/src/main/java/com/radioip/backend/model/AppearanceSettings.java

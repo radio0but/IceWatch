@@ -1,5 +1,6 @@
 package com.radioip.backend.config;
 
+import com.radioip.backend.security.LoginRateLimitFilter;
 import com.radioip.backend.service.LocalUserDetailsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,6 +23,7 @@ import org.springframework.security.ldap.authentication.LdapAuthenticationProvid
 import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
 import java.util.*;
@@ -53,7 +55,6 @@ public class Security_Config {
         daoProvider.setUserDetailsService(userService);
         daoProvider.setPasswordEncoder(encoder);
 
-        // Si LDAP est configuré
         if (ldapUrl != null && !ldapUrl.isBlank() &&
             ldapBase != null && !ldapBase.isBlank() &&
             userDnPattern != null && !userDnPattern.isBlank()) {
@@ -76,7 +77,6 @@ public class Security_Config {
             return new ProviderManager(List.of(daoProvider, ldapProvider));
         }
 
-        // Sinon → pas de LDAP
         return new ProviderManager(List.of(daoProvider));
     }
 
@@ -110,7 +110,8 @@ public class Security_Config {
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             AuthenticationManager authManager,
-            IceWatchConfig config
+            IceWatchConfig config,
+            LoginRateLimitFilter loginRateLimitFilter // ← injection du filtre
     ) throws Exception {
 
         http.csrf(csrf -> csrf.disable());
@@ -144,6 +145,9 @@ public class Security_Config {
         http.logout(logout -> logout.permitAll())
             .authenticationManager(authManager)
             .headers(headers -> headers.frameOptions().disable());
+
+        // Ajoute le filtre anti-brute-force AVANT l'authentification Spring
+        http.addFilterBefore(loginRateLimitFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
