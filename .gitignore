@@ -2,4 +2,4 @@ target/
 *.jar
 *.class
 *.log
-
+sendJAR.sh
