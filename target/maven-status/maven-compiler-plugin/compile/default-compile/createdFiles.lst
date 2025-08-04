@@ -22,6 +22,7 @@ com/radioip/backend/service/MetadataService.class
 com/radioip/backend/repository/LocalUserRepository.class
 com/radioip/backend/controller/StaticPageController.class
 com/radioip/backend/controller/SlotInfoController.class
+com/radioip/backend/config/CacheConfig.class
 com/radioip/backend/repository/AppearanceSettingsRepository.class
 com/radioip/backend/controller/StreamController.class
 com/radioip/backend/controller/MetadataController.class
@@ -31,4 +32,3 @@ com/radioip/backend/model/SlotInfo.class
 com/radioip/backend/config/AppearanceConfig.class
 com/radioip/backend/config/CorsConfig.class
 com/radioip/backend/controller/AdminUserController.class
-com/radioip/backend/service/ArtistImageService.class

@@ -1,5 +1,8 @@
 package com.radioip.backend.controller;
 
+
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+
 import com.radioip.backend.config.IceWatchConfig;
 import com.radioip.backend.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,7 +57,7 @@ public class AuthController {
     public Map<String, String> getFrontendConfig(HttpServletRequest request) {
         return Map.of("apiBase", config.getAllowedDomain());
     }
-
+    @RateLimiter(name = "tokenLimiter")
     @GetMapping("/auth/token")
     public ResponseEntity<?> getToken(HttpServletRequest req) {
         String ip = req.getRemoteAddr();

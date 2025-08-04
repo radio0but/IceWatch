@@ -1,6 +1,10 @@
 package com.radioip.backend.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -11,6 +15,9 @@ import java.util.*;
 @Service
 public class MetadataService {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Cacheable("metadata")
     public Optional<Map<String, Object>> enrich(String rawTitle) {
         if (!rawTitle.contains(" - ")) return Optional.empty();
 
@@ -32,96 +39,41 @@ public class MetadataService {
             }
             conn.disconnect();
 
-            // Affichage du JSON pour le débogage
-            System.out.println("Réponse JSON brute : " + json);
+            JsonNode root = objectMapper.readTree(json);
+            JsonNode recordings = root.path("recordings");
+            if (!recordings.isArray()) return Optional.empty();
 
             Map<String, Object> enriched = new HashMap<>();
             enriched.put("title", title);
             enriched.put("artist", artist);
 
             List<Map<String, String>> albums = new ArrayList<>();
-            int pos = 0;
-            while ((pos = json.indexOf("{\"id\":\"", pos)) != -1) {
-                Map<String, String> album = new HashMap<>();
+            Set<String> seenTitles = new HashSet<>();
 
-                // Extraction de l'ID de l'album
-                int idStart = json.indexOf("\"id\":\"", pos) + 6;
-                int idEnd = json.indexOf("\"", idStart);
-                if (idStart == -1 || idEnd == -1) break;
-                album.put("id", json.substring(idStart, idEnd));
+            for (JsonNode rec : recordings) {
+                JsonNode releases = rec.path("releases");
+                for (JsonNode release : releases) {
+                    String id = release.path("id").asText();
+                    String albumTitle = release.path("title").asText();
+                    if (id.isEmpty() || albumTitle.isEmpty() || !seenTitles.add(albumTitle)) continue;
 
-                // Extraction du titre de l'album
-                int titleStart = json.indexOf("\"title\":\"", idEnd) + 10;
-                int titleEnd = json.indexOf("\"", titleStart);
-                if (titleStart == -1 || titleEnd == -1) {
-                    System.out.println("Erreur dans l'extraction du titre");
-                    break;
-                }
-
-                // Extrait le titre complet sans modification
-                String albumTitle = json.substring(titleStart - 1, titleEnd);
-
-                // Log du titre extrait pour le débogage
-                System.out.println("Titre de l'album extrait : " + albumTitle);
-
-                // Vérification si la première lettre du titre est manquante
-                if (albumTitle.length() > 1 && !Character.isLetterOrDigit(albumTitle.charAt(0))) {
-                    albumTitle = albumTitle.substring(1); // Ajouter la première lettre manquante
-                }
-
-                // Vérifier que le titre est valide
-                if (albumTitle != null && !albumTitle.isEmpty()) {
+                    Map<String, String> album = new HashMap<>();
+                    album.put("id", id);
                     album.put("album", albumTitle);
-                } else {
-                    System.out.println("Titre vide ou invalide pour l'album");
+                    album.put("date", release.path("date").asText(""));
+                    album.put("firstReleaseDate", release.path("first-release-date").asText(""));
+                    album.put("cover", "https://coverartarchive.org/release/" + id + "/front-250");
+                    albums.add(album);
                 }
-
-                // Extraction de la première date de sortie
-                int firstReleaseDateStart = json.indexOf("\"first-release-date\":\"", titleEnd);
-                if (firstReleaseDateStart != -1) {
-                    firstReleaseDateStart += 21;  // Length of the string "\"first-release-date\":\""
-                    int firstReleaseDateEnd = json.indexOf("\"", firstReleaseDateStart);
-                    if (firstReleaseDateEnd > firstReleaseDateStart) {
-                        album.put("firstReleaseDate", json.substring(firstReleaseDateStart, firstReleaseDateEnd));
-                    }
-                }
-
-                // Extraction de la date de sortie
-                int dateStart = json.indexOf("\"date\":\"", titleEnd);
-                if (dateStart != -1) {
-                    dateStart += 8;
-                    int dateEnd = json.indexOf("\"", dateStart);
-                    if (dateEnd > dateStart) {
-                        album.put("date", json.substring(dateStart, dateEnd));
-                    }
-                }
-
-                // URL de la couverture de l'album
-                String coverUrl = "https://coverartarchive.org/release/" + album.get("id") + "/front-250";
-                
-                // Vérification de l'URL de couverture et ajout de l'image de fallback si nécessaire
-                if (coverUrl == null || coverUrl.isEmpty()) {
-                    coverUrl = "/static/album.png";  // URL de fallback pour l'image
-                }
-
-                album.put("cover", coverUrl);
-
-                albums.add(album);
-                pos = titleEnd;
             }
 
-            // Si des albums ont été trouvés, les trier et ajouter les infos enrichies
             if (!albums.isEmpty()) {
-                // Trier les albums par date
                 albums.sort(Comparator.comparing(a -> a.getOrDefault("date", "9999")));
-
-                // Inverser la liste pour afficher le dernier album en premier
-                //Collections.reverse(albums);
-
-                enriched.put("album", albums.get(0).get("album"));
-                enriched.put("date", albums.get(0).get("date"));
-                enriched.put("cover", albums.get(0).get("cover"));
-                enriched.put("firstReleaseDate", albums.get(0).get("firstReleaseDate"));
+                Map<String, String> latest = albums.get(0);
+                enriched.put("album", latest.get("album"));
+                enriched.put("date", latest.get("date"));
+                enriched.put("cover", latest.get("cover"));
+                enriched.put("firstReleaseDate", latest.get("firstReleaseDate"));
                 enriched.put("allAlbums", albums);
             }
 

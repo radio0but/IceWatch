@@ -1,8 +1,7 @@
 // MetadataController.java
 package com.radioip.backend.controller;
-
+import org.springframework.cache.annotation.Cacheable;
 import com.radioip.backend.config.IceWatchConfig;
-import com.radioip.backend.service.ArtistImageService;
 import com.radioip.backend.service.MetadataService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +34,7 @@ public class MetadataController {
         this.metadataService = metadataService;
     }
 
-    @Autowired
-    private ArtistImageService artistImageService;
-
+    @Cacheable(value = "icecastMeta", key = "'last'")
     @GetMapping("/radio/metadata")
     public Map<String, String> getMetadata(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", config.getAllowedDomain());
@@ -86,11 +83,6 @@ public class MetadataController {
                 });
     }
 
-    @GetMapping("/artist/image")
-    public String getArtistImage(@RequestParam String artistName) {
-        Optional<String> imageUrl = artistImageService.getArtistImage(artistName);
-        return imageUrl.orElse("/static/default-artist-image.png");
-    }
 
     @GetMapping("/radio/metadata/info")
     public ResponseEntity<String> getEmissionInfo() {

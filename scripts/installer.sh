@@ -160,6 +160,11 @@ icewatch.icecast-stream-url=http://localhost:8000/radio
 icewatch.admin-password=${LOCAL_ADMIN_PW}
 icewatch.enseignant-password=${LOCAL_ENSEIGNANT_PW}
 
+#Sécurité Token
+resilience4j.ratelimiter.instances.tokenLimiter.limitForPeriod=5
+resilience4j.ratelimiter.instances.tokenLimiter.limitRefreshPeriod=10s
+resilience4j.ratelimiter.instances.tokenLimiter.timeoutDuration=0
+
 # === PostgreSQL
 spring.datasource.url=jdbc:postgresql://localhost:5432/icewatchdb
 spring.datasource.username=icewatch
