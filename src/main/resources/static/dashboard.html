@@ -55,8 +55,8 @@
   <h2>Planning des créneaux</h2>
 
   <p style="margin-top: -0.5rem; max-width: 800px; line-height: 1.6;">
-    Le planning ci-dessous affiche les contenus prévus pour chaque heure, que ce soit pour la radio 🎧 ou la télévision 📺.
-    Les créneaux peuvent être vides ⚪, automatiques ⚙️ (lecture planifiée) ou en direct 🔴.
+    Le planning ci-dessous affiche les contenus prévus pour chaque heure, que ce soit pour la radio 📻 ou la télévision 📺.
+    Les créneaux peuvent être vides 🔵, automatiques ✅ (lecture planifiée) ou en direct 🟡.
     <br><br>
     Les fichiers doivent être placés dans les dossiers locaux accessibles uniquement depuis les ordinateurs du <strong>studio</strong> ou de la <strong>salle Muse</strong>.
   </p>
@@ -65,14 +65,13 @@
     <li>🎧 <code>~/radioemissions/&lt;jour&gt;/&lt;heure&gt;/</code></li>
     <li>📺 <code>~/owncastvideos/&lt;N&gt;&lt;Jour&gt;/&lt;heure&gt;/</code> (ex. <code>4Mercredi/14</code>)</li>
   </ul>
-
-  <div class="legend">
-    <span>📻 = Radio</span>
-    <span>📺 = Vidéo</span>
-    <span class="status-live">🔴 En direct</span>
-    <span class="status-auto">⚙️ Automatique</span>
-    <span class="status-empty">⚪ Vide</span>
-  </div>
+<div class="legend">
+  <span>📻 = Radio</span>
+  <span>📺 = Télévision</span>
+  <span class="status-live" style="color: gold; font-weight: bold;">🟡 En direct</span>
+  <span class="status-auto" style="color: limegreen; font-weight: bold;">✅  Automatique</span>
+  <span class="status-empty" style="color: dodgerblue; font-weight: bold;">🔵 Vide</span>
+</div>
 
   <div class="schedule-wrapper">
     <div id="schedule-grid">

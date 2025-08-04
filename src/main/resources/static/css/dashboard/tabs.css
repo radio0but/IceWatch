@@ -37,7 +37,7 @@
   max-width: 1064px;
   padding: 1rem;
   background-color: var(--bg-light);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(110, 12, 12, 0.616);
   border-radius: 6px;
   box-shadow: 0 0 10px #0003;
 }

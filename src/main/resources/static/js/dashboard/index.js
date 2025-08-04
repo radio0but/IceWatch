@@ -55,13 +55,13 @@ async function updateStreamStatus() {
     const json = await res.json(); // attendu : { audio: "live", video: "auto" }
 
     const icons = {
-      live: "🔴 En direct",
-      auto: "⚙️ Auto",
-      vide: "⚪ Vide"
+      live: "🟡 En direct",
+      auto: "✅ Auto",
+      vide: "🔵 Vide"
     };
 
     const label =
-      `🎧 ${icons[json.audio] || "?"} &nbsp;&nbsp;📺 ${icons[json.video] || "?"}`;
+      `📻 ${icons[json.audio] || "?"} &nbsp;&nbsp;📺 ${icons[json.video] || "?"}`;
 
     const el = document.getElementById("stream-status");
     if (el) el.innerHTML = label;

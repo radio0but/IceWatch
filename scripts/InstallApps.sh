@@ -321,6 +321,20 @@ if ! modinfo cifs &> /dev/null; then
 fi
 
 # --- Début de la section montage dynamique ---
+# === Ajout des droits sudo NOPASSWD pour les montages CIFS ===
+info "Ajout des permissions sudo sans mot de passe pour les montages CIFS..."
+
+CIFS_RULES_FILE="/etc/sudoers.d/cifs-mount"
+CURRENT_USER="$(whoami)"
+
+# Écriture sécurisée des règles
+sudo bash -c "cat > $CIFS_RULES_FILE" <<EOF
+$CURRENT_USER ALL=(ALL) NOPASSWD: /usr/bin/mount -t cifs //192.168.0.170/radioemissions /home/$CURRENT_USER/radioemissions -o guest,uid=1000,gid=1000,iocharset=utf8
+$CURRENT_USER ALL=(ALL) NOPASSWD: /usr/bin/mount -t cifs //192.168.0.170/owncastvideos /home/$CURRENT_USER/owncastvideos -o guest,uid=1000,gid=1000,iocharset=utf8
+EOF
+
+sudo chmod 440 "$CIFS_RULES_FILE"
+info "Fichier sudoers créé : $CIFS_RULES_FILE"
 
 
 # Définition des variables de montage

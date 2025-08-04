@@ -57,12 +57,6 @@ public class AuthController {
 
     @GetMapping("/auth/token")
     public ResponseEntity<?> getToken(HttpServletRequest req) {
-        String referer = req.getHeader("Referer");
-        if (referer == null || !referer.startsWith(config.getAllowedDomain())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(Map.of("error", "Accès interdit : Referer non autorisé."));
-        }
-
         String ip = req.getRemoteAddr();
         Bucket bucket = resolveBucket(ip);
 
@@ -71,6 +65,13 @@ public class AuthController {
                 .body(Map.of("error", "Trop de requêtes. Réessaie plus tard."));
         }
 
+        String referer = req.getHeader("Referer");
+        if (referer == null || !referer.startsWith(config.getAllowedDomain())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", "Accès interdit : Referer non autorisé."));
+        }
+
         return ResponseEntity.ok(Map.of("token", tokenService.generateToken()));
     }
+
 }
