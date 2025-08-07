@@ -16,6 +16,9 @@ import {
 import { loadSchedule } from "./schedule.js";
 import { loadRSSConfig } from "./rss.js";
 import { fetchUsers } from "./users.js";
+import { initCustomPages } from "./pages.js";
+
+import { initAppearanceEditor } from "./appearanceEditor.js";
 
 function setupSidebarNav() {
   const buttons = document.querySelectorAll(".sidebar-nav button");
@@ -76,12 +79,15 @@ async function updateStreamStatus() {
 updateStreamStatus();
 setInterval(updateStreamStatus, 10000);
 
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
   setupSidebarNav();
   setupSidebarToggle();
   updateSchedulerStatus();
   setupAppearanceNotesAutoSave();
-  loadProperties();
+  initCustomPages();
+
+  await loadProperties();           // ✅ On attend que le contenu soit chargé
+  initAppearanceEditor();          // ✅ Maintenant on peut initialiser les champs
 
   // Actions boutons
   const withFeedback = async (btnId, spanId, action) => {

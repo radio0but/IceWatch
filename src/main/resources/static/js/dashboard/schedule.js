@@ -1,4 +1,8 @@
 // dashboard/schedule.js
+import { setupDualEditor } from "./tinymce.js";
+import { setupTinyMCE } from "./tinymce.js";
+
+
 function renderTree(tree, indent = 0) {
   if (!tree || typeof tree !== 'object') return "";
 
@@ -109,7 +113,7 @@ window.showSlotContents = async function (jour, heure) {
           <div id="preview-audio-info" class="markdown-preview"><em>Aucun contenu…</em></div>
 
           <label>📺 Vidéo :</label>
-          <textarea id="video-info" rows="4">${videoInfo}</textarea>
+          <textarea id="video-info">${videoInfo}</textarea>
           <button type="button" onclick="refreshMarkdown('video-info', 'preview-video-info')">🔄 Actualiser aperçu</button>
           <div id="preview-video-info" class="markdown-preview"><em>Aucun contenu…</em></div>
 
@@ -127,7 +131,8 @@ window.showSlotContents = async function (jour, heure) {
 
     document.getElementById("schedule-grid").style.display = "none";
     detail.style.display = "block";
-
+    setupTinyMCE('#audio-info');
+    setupTinyMCE('#video-info');
   } catch (err) {
     alert("Erreur lors du chargement du contenu : " + err.message);
   }
@@ -136,6 +141,8 @@ window.showSlotContents = async function (jour, heure) {
 
 // Naviguer
 window.backToSchedule = () => {
+  if (tinymce.get("audio-info")) tinymce.get("audio-info").remove();
+  if (tinymce.get("video-info")) tinymce.get("video-info").remove();
   document.getElementById("slot-details").style.display = "none";
   document.getElementById("schedule-grid").style.display = "grid";
 };
@@ -174,9 +181,11 @@ window.saveCurrentEmission = async function () {
   const detail = document.getElementById("slot-details");
   const jour = detail.dataset.jour;
   const heure = detail.dataset.heure;
-
+  if (tinymce.get("audio-info")) tinymce.get("audio-info").save();
+  if (tinymce.get("video-info")) tinymce.get("video-info").save();
   const audioInfo = document.getElementById("audio-info").value;
   const videoInfo = document.getElementById("video-info").value;
+  
 
   const jours = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"];
 

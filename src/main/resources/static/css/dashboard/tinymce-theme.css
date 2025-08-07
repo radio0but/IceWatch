@@ -1,0 +1,56 @@
+/* Fond de l’éditeur (extérieur) */
+.tox.tox-tinymce {
+  background-color: #1e1e2f !important;
+  border-radius: 12px !important;
+  border: 1px solid #333;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+/* Toolbar */
+.tox .tox-toolbar {
+  background-color: #292940 !important;
+  border-bottom: 1px solid #444;
+}
+
+/* Boutons */
+.tox .tox-toolbar__primary button {
+  background: #333 !important;
+  color: #eee !important;
+  border-radius: 6px !important;
+  transition: 0.2s ease;
+}
+
+.tox .tox-toolbar__primary button:hover {
+  background: #555 !important;
+  color: #fff !important;
+}
+
+/* Icônes */
+.tox .tox-icon svg {
+  fill: #ccc !important;
+}
+
+/* Fond du dropdown de styles */
+.tox .tox-menu {
+  background-color: #222 !important;
+  color: #eee !important;
+  border: 1px solid #555 !important;
+}
+.tox .tox-toolbar, .tox .tox-toolbar__overflow, .tox .tox-toolbar__primary {
+    background-color: #000000!important;
+ 
+}
+
+.tox:not(.tox-tinymce-inline) .tox-editor-header {
+    background-color: #000000 !important;
+    border-bottom: 1px solid rgba(53, 0, 0, 0.904) !important;
+}
+
+.tox .tox-statusbar
+ {
+    background-color: #000000 !important;
+ }
+
+ .mce-content-body {
+    background-color: rgb(125 125 125) !important;
+}

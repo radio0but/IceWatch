@@ -6,7 +6,8 @@ import java.util.Optional;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-
+import com.radioip.backend.model.CustomPage;
+import com.radioip.backend.repository.CustomPageRepository;
 import com.radioip.backend.config.IceWatchConfig;
 import com.radioip.backend.config.AppearanceConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+
+
+
 @RestController
 public class StaticPageController {
+
+
+    @Autowired
+    private CustomPageRepository repository;
 
     @Autowired
     private SettingRepository settingRepository;
@@ -52,12 +60,36 @@ public class StaticPageController {
         sendHtmlWithSubstitutions("static/dashboard.html", response);
     }
 
+
+
 private void sendHtmlWithSubstitutions(String path, HttpServletResponse response) throws IOException {
     String html = StreamUtils.copyToString(new ClassPathResource(path).getInputStream(), StandardCharsets.UTF_8);
     String logoutButton = "";
     String logoutTab = "";
     String journalButton = "";
     String journalTab = "";
+    StringBuilder pageButtons = new StringBuilder();
+    StringBuilder pageTabs = new StringBuilder();
+
+    for (CustomPage page : repository.findAll()) {
+        if (!page.isEnabled()) continue;
+
+        String slug = page.getSlug();
+        String title = page.getTitle();
+
+        // 🔘 Bouton dans la barre d'onglets
+    pageButtons.append("""
+        <button class="tab-button" data-tab="%1$s">%2$s</button>
+        """.formatted(slug, title));   
+    pageTabs.append("""
+        <div id="tab-%1$s" class="tab-content">
+        %2$s
+        </div>
+        """.formatted(slug, page.getHtmlContent() != null ? page.getHtmlContent() : ""));
+
+
+    }
+
 
     // Vérifie si un flux RSS est défini ET accessible (code HTTP 200)
     Optional<Setting> rss = settingRepository.findByKey("rss-url");
@@ -71,13 +103,13 @@ private void sendHtmlWithSubstitutions(String path, HttpServletResponse response
             "</div>";
     }
     if (!config.isDisableLogin()) {
-        logoutButton = "<button class=\"tab-button\" data-tab=\"logout\">🚪 Déconnexion</button>";
-        logoutTab =
-            "<div id=\"tab-logout\" class=\"tab-content\" style=\"text-align:center;\">\n" +
-            "  <p style=\"margin: 2rem;\">Cliquez ci-dessous pour vous déconnecter.</p>\n" +
-            "  <a href=\"/logout\" class=\"button-logout\">🔒 Se déconnecter</a>\n" +
-            "</div>";
-    }
+    logoutButton = "<button id=\"logout-tab-button\" class=\"tab-button\" data-tab=\"logout\">🚪</button>";
+    logoutTab =
+        "<div id=\"tab-logout\" class=\"tab-content\" style=\"text-align:center;\">\n" +
+        "  <p style=\"margin: 2rem;\">Cliquez ci-dessous pour vous déconnecter.</p>\n" +
+        "  <a href=\"/logout\" class=\"button-logout\">🔒 Se déconnecter</a>\n" +
+        "</div>";
+}
 
 
     html = html
@@ -92,8 +124,9 @@ private void sendHtmlWithSubstitutions(String path, HttpServletResponse response
         .replace("${logout.tab}", logoutTab)
         .replace("${journal.button}", journalButton)
         .replace("${journal.tab}", journalTab)
-        .replace("${notes}", appearance.getNotes() != null ? appearance.getNotes() : "");
-
+        .replace("${notes}", appearance.getNotes() != null ? appearance.getNotes() : "")
+        .replace("${custompage.buttons}", pageButtons.toString())
+        .replace("${custompage.tabs}", pageTabs.toString());
 
     response.setContentType("text/html; charset=UTF-8");
     response.getWriter().write(html);

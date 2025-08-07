@@ -5,64 +5,72 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${radio.plainTitle}</title>
-<link rel="stylesheet" href="/css/portal/index.css">
-<link rel="stylesheet" href="/css/components/radioPlayer.css">
+  <link rel="stylesheet" href="/css/portal/index.css">
+  <link rel="stylesheet" href="/css/components/radioPlayer.css">
   <style>${custom.css}</style>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
 </head>
 <body>
-  <h1>${radio.title}<span class="logo-antenna">📡</span></h1>
-  <p>${welcome.message}</p>
- 
-<div id="admin-link" style="display: none; margin-top: 20px; text-align: center;">
-  <button class="tab-button" onclick="location.href='/dashboard'">🔧 Tableau de bord</button>
+  <div id="logout-button-wrapper" style="position: absolute; top: 1rem; right: 1rem; z-index: 1000;">
+  ${logout.button}
+
+  <!-- Affiché uniquement pour les admins -->
+  <span id="admin-link" style="display: none;">
+    <button id="dashboard-button" class="button-logout" title="Tableau de bord" style="margin-left: 0.5rem;" onclick="location.href='/dashboard'">🔧</button>
+  </span>
 </div>
 
+<div class="main-panel">
+
+  <h1 style="margin-bottom: 0.8rem;">${radio.title}</h1>
 
   <div class="tabs">
-    <button class="tab-button active" data-tab="radio">🎧 Radio</button>
+
+    <button class="tab-button" data-tab="welcome">🏠 Accueil</button>
+    <button class="tab-button" data-tab="radio">🎧 Radio</button>
     <button class="tab-button" data-tab="video">🎥 Télévision</button>
     ${journal.button}
-    ${logout.button}
+    ${custompage.buttons}
   </div>
 
-<div id="tab-radio" class="tab-content active">
-  <div id="radio-layout">
-    <div id="audio-description"></div>
-    <div id="radio-right">
-      <div id="player-container">Chargement du lecteur audio…</div>
-      <div id="metadata">Chargement des infos…</div>
-      <div id="carousel-wrapper" style="display:none">
-        <div id="carousel">
-          <div class="carousel-inner" id="carousel-inner"></div>
-          <button id="prev-button" class="carousel-button"><img src="/gauche.png" alt="◀️"></button>
-          <button id="next-button" class="carousel-button"><img src="/droite.png" alt="▶️"></button>
+  <!-- Onglet Accueil -->
+  <div id="tab-welcome" class="tab-content active">
+    <div id="welcome-message">${welcome.message}</div>
+  </div>
+
+  <!-- Onglet Radio -->
+  <div id="tab-radio" class="tab-content">
+    <div id="radio-layout">
+      <div id="audio-description"></div>
+      <div id="radio-right">
+        <div id="player-container">Chargement du lecteur audio…</div>
+        <div id="metadata">Chargement des infos…</div>
+        <div id="carousel-wrapper" style="display:none">
+          <div id="carousel">
+            <div class="carousel-inner" id="carousel-inner"></div>
+            <button id="prev-button" class="carousel-button"><img src="/gauche.png" alt="◀️"></button>
+            <button id="next-button" class="carousel-button"><img src="/droite.png" alt="▶️"></button>
+          </div>
         </div>
       </div>
-       
     </div>
   </div>
-</div>
 
-<div id="tab-video" class="tab-content">
-  <div id="video-layout" class="content-grid">
-    <!-- Colonne gauche : description -->
-    <div id="video-description"></div>
-
-    <!-- Colonne droite : vidéo + custom HTML -->
-    <div class="video-side">
-      <div id="video-container">Chargement du lecteur vidéo…</div>
+  <!-- Onglet Vidéo -->
+  <div id="tab-video" class="tab-content">
+    <div id="video-layout" class="content-grid">
+      <div id="video-description"></div>
+      <div class="video-side">
+        <div id="video-container">Chargement du lecteur vidéo…</div>
+      </div>
     </div>
   </div>
-</div>
 
+  ${custompage.tabs}
   ${journal.tab}
   ${logout.tab}
-<div id="custom-html-global">
-  <div id="custom-html">${custom.html}</div>
+  ${custom.html}
 </div>
-<script type="module" src="/js/portal/index.js"></script>
-
+  <script type="module" src="/js/portal/index.js"></script>
 </body>
 </html>

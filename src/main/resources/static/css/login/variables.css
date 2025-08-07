@@ -2,7 +2,7 @@
 
 :root {
   --background: linear-gradient(135deg, #23242a 0%, #29344a 100%);
-  --glass: rgba(28, 28, 36, 0.92);
+  --glass: rgba(0, 0, 0, 0.664);
   --accent: #e53935;
   --input-bg: rgba(255,255,255,0.05);
   --input-border: #444;

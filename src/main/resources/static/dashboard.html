@@ -38,8 +38,9 @@
       <!-- <button data-tab="status" data-label="📈">📈 État</button> -->
       <button data-tab="slots" data-label="📅">📅 Créneaux</button>
       <button data-tab="rss" data-label="🗞️">🗞️ Journal</button>
-      <button data-tab="users" data-label="👥">👥 Utilisateurs</button>
+      <button data-tab="pages" data-label="🧩">🧩 Pages</button>
       <button data-tab="appearance" data-label="🎨">🎨 Personnalisation</button>
+      <button data-tab="users" data-label="👥">👥 Utilisateurs</button>
       <button data-tab="maintenance" data-label="🛠️">🛠️ Maintenance</button>
 
     </nav>
@@ -133,17 +134,19 @@
       <div id="tab-appearance" class="tab-content">
   <h2>🧑‍🎨 Personnalisation de l’apparence</h2>
 
-  <p>
-    <strong>Instructions :</strong><br>
-    Toutes les options de personnalisation peuvent être modifiées depuis cette interface.
-    <ul style="margin-top:0;">
-      <li><strong>1.</strong> Cliquez sur <strong>♻️ Réinitialiser Apparence</strong> pour repartir d’une base propre, si nécessaire.</li>
-      <li><strong>2.</strong> Modifiez les paramètres dans la zone ci-dessous.</li>
-      <li><strong>3.</strong> Cliquez sur <strong>📎 Enregistrer</strong> pour appliquer vos modifications.</li>
-      <li><strong>4.</strong> Rechargez la page si vous souhaitez voir les effets visuels dans le tableau de bord.</li>
-    </ul>
-    Les modifications sont appliquées immédiatement après l’enregistrement.
-  </p>
+<p>
+  <strong>Instructions :</strong><br>
+  Toutes les options de personnalisation peuvent être modifiées depuis cette interface.
+  <ul style="margin-top:0;">
+    <li><strong>1.</strong> Cliquez sur <strong>♻️ Réinitialiser Apparence</strong> pour repartir d’une base propre, si nécessaire.</li>
+    <li><strong>2.</strong> Utilisez les champs du formulaire ci-dessous pour modifier visuellement chaque option (titres, message de bienvenue, couleurs, etc.).</li>
+    <li><strong>3.</strong> Cliquez sur <strong>🔁 Générer le fichier .look</strong> pour synchroniser vos modifications avec la zone de configuration brute.</li>
+    <li><strong>4.</strong> Cliquez sur <strong>📎 Appliquer</strong> pour enregistrer vos modifications.</li>
+    <li><strong>5.</strong> Rechargez la page pour voir les changements dans l’interface.</li>
+  </ul>
+  Les changements sont appliqués dès l’enregistrement. Vous pouvez aussi exporter ou importer des fichiers <code>.look</code> pour sauvegarder ou restaurer un thème.
+</p>
+
 
   <textarea id="properties-editor" rows="15" style="width:100%;"></textarea>
 <!-- Boutons regroupés -->
@@ -173,6 +176,41 @@
   </p>
   <textarea id="appearance-notes" rows="8" style="width:100%; resize:vertical; font-family:monospace;" placeholder="Vos notes ici…">${notes}</textarea>
 </div>
+
+
+<div id="tab-pages" class="tab-content">
+  <h2>🧩 Pages personnalisées</h2>
+
+  <p>
+    Cette section vous permet d’ajouter des pages HTML personnalisées qui seront affichées comme des onglets publics dans le portail.
+  </p>
+
+  <form id="custom-page-form">
+    <input type="hidden" id="page-id" />
+    <label>Titre : <input type="text" id="page-title" required /></label><br>
+    <label>Slug : <input type="text" id="page-slug" placeholder="ex: a-propos" required /></label><br>
+    <label>Contenu HTML :</label><br>
+    <textarea id="page-html" rows="8" style="width: 100%;"></textarea><br>
+    <label><input type="checkbox" id="page-enabled" /> Activer cette page</label><br>
+    <button type="submit">💾 Enregistrer</button>
+    <button type="button" onclick="resetPageForm()">↩️ Réinitialiser</button>
+  </form>
+
+  <hr>
+
+  <h3>📄 Pages existantes</h3>
+  <table style="width: 100%;">
+    <thead>
+      <tr><th>Titre</th><th>Slug</th><th>Activée</th><th>Actions</th></tr>
+    </thead>
+    <tbody id="pages-table">
+      <!-- Dynamique -->
+    </tbody>
+  </table>
+</div>
+
+
+
 
       <div id="tab-maintenance" class="tab-content">
   <h2>Redémarrer IceWatch & Schedulers</h2>
@@ -234,6 +272,7 @@
   </div>
   <iframe id="preview-iframe" src="/index"></iframe>
 </div>
+<script src="/lib/tinymce/tinymce.min.js"></script>
 <script type="module" src="/js/dashboard/index.js"></script>
 </body>
 </html>

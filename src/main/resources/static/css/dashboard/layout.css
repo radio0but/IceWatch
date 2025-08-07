@@ -47,6 +47,8 @@ body {
   box-shadow: 4px 0 12px rgba(0,0,0,0.2);
   height: auto;
   width: fit-content;
+  border: inset;
+  border-color: #8b00003b;
 }
 
 
@@ -225,7 +227,7 @@ html, body {
     top: 0;
     right: 0;
     height: 64px;
-    background-color: #1a1a1a;
+    background-color: #000000a8;
     color: #eee;
     display: flex;
     align-items: center;
@@ -317,6 +319,21 @@ span#stream-status
     border: groove;
     border-color: dimgrey;
     width: max-content;
+}
+
+
+.page-wrapper {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 1.5rem;
+  max-width: 720px;
+  margin: 2rem auto;
+  border-radius: 8px;
+  font-family: inherit;
+  color: inherit;
+}
+
+input {
+    max-width: -webkit-fill-available;
 }
 
 @media (max-width: 1024px) {

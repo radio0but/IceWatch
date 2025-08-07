@@ -15,7 +15,11 @@ window.addEventListener("DOMContentLoaded", async () => {
     // === VIDEO ===
     const token = await fetchToken(); // important pour la vidéo
     await setupVideo(token);
-
+      document.querySelectorAll("iframe").forEach(iframe => {
+        if (iframe.src.includes("${token}")) {
+          iframe.src = iframe.src.replace("${token}", encodeURIComponent(token));
+        }
+      });
     // === Autres modules ===
     updateMetadata();
     startAutoScrollAfterDelay();

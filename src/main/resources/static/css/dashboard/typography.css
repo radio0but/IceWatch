@@ -14,3 +14,18 @@ h1, h2 {
 .status-active { color: #4caf50; }
 .status-inactive { color: #f44336; }
 .status-unknown { color: #ff9800; }
+
+.logo-antenna {
+  font-size: 1.5rem;
+  margin-left: 0.3em;
+  vertical-align: -0.2em;
+  opacity: 0.87;
+  filter: drop-shadow(0 0 16px #e53935bb);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { filter: drop-shadow(0 0 8px #e53935bb);}
+  50% { filter: drop-shadow(0 0 24px #e5393588);}
+  100% { filter: drop-shadow(0 0 8px #e53935bb);}
+}
