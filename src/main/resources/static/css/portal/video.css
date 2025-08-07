@@ -41,8 +41,8 @@
 
 @media (max-width: 1024px) {
   #video-container iframe {
-    width: 384px;
-    height: 283px;
+    width: -webkit-fill-available;
+    height: 350px;
   }
 
   #video-layout {

@@ -94,7 +94,7 @@ private void sendHtmlWithSubstitutions(String path, HttpServletResponse response
     // Vérifie si un flux RSS est défini ET accessible (code HTTP 200)
     Optional<Setting> rss = settingRepository.findByKey("rss-url");
     if (rss.isPresent() && isValidRSS(rss.get().getValue())) {
-        journalButton = "<button class=\"tab-button\" id=\"journal-tab-button\" data-tab=\"journal\">🗞️ Journal</button>";
+        journalButton = "<button class=\"tab-button\" id=\"journal-tab-button\" data-tab=\"journal\" data-icon=\"🗞️\">🗞️ Journal</button>";
         journalTab =
             "<div id=\"tab-journal\" class=\"tab-content\">\n" +
             "  <h2>🗞️ Journal étudiant</h2>\n" +
@@ -103,7 +103,7 @@ private void sendHtmlWithSubstitutions(String path, HttpServletResponse response
             "</div>";
     }
     if (!config.isDisableLogin()) {
-    logoutButton = "<button id=\"logout-tab-button\" class=\"tab-button\" data-tab=\"logout\">🚪</button>";
+    logoutButton = "<button id=\"logout-tab-button\" class=\"tab-button\" data-tab=\"logout\" data-icon=\"🚪\">🚪</button>";
     logoutTab =
         "<div id=\"tab-logout\" class=\"tab-content\" style=\"text-align:center;\">\n" +
         "  <p style=\"margin: 2rem;\">Cliquez ci-dessous pour vous déconnecter.</p>\n" +

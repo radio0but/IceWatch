@@ -3,7 +3,7 @@ import { updateMetadata, startAutoScrollAfterDelay } from "./metadata.js";
 import { initJournalRSS } from "./rss.js";
 import { setupTabs } from "./tabs.js";
 import { loadEmissionDescriptions } from "./emission.js";
-
+import { initParallaxAndStickyHeader } from "./parallaxHeader.js"
 window.addEventListener("DOMContentLoaded", async () => {
   try {
     await fetchApiBase();
@@ -30,7 +30,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("player-container").innerText = "❌ Erreur de lecture audio.";
     document.getElementById("video-container").innerText = "❌ Erreur de lecture vidéo.";
   }
-
+  initParallaxAndStickyHeader();
   setInterval(updateMetadata, 15000);
   setupTabs();
   showAdminLinkIfNeeded();

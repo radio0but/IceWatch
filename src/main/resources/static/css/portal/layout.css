@@ -2,15 +2,14 @@ body {
   min-height: 100vh;
   margin: 0;
   font-family: 'Inconsolata', monospace;
-  background: 
-    linear-gradient(135deg, rgba(24, 25, 34, 0.9) 40%, rgba(37, 40, 59, 0.2) 100%),
-    url('/background.png') center center / cover no-repeat;
   color: var(--text);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   overflow-x: hidden;
+  background: none; /* 👈 important ! */
+  background-color: black;
 }
 
 #artist-image-container {
@@ -84,8 +83,108 @@ body {
   margin: 2rem auto;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
+#parallax-bg {
+  position: fixed;
+  top: -225px;
+  left: 0;
+  width: 120%;
+  height: 120%;
+  z-index: -100;
+  background-image: linear-gradient(135deg, rgba(24, 25, 34, 0.9) 40%, rgba(37, 40, 59, 0.2) 100%), url('/background.png');
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+  transform: translate(0, 0) scale(1.08);
+  transition: transform 0.1s ease-out;
+}
+/* Fond sticky qui apparait derrière les onglets */
+.tabs.sticky {
+  position: sticky;
+  top: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(3px);
+  z-index: 999;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+/* Optionnel : changer le style des boutons en mode sticky */
+.tabs.sticky .tab-button {
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+}
+.tabs {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.tabs.sticky {
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(3px);
+  z-index: 999;
+  padding: 0.5rem 0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.tabs.sticky .tab-button {
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+}
+ #logout-button-wrapper {
+    position: fixed !important;
+    bottom: 1rem;
+    right: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    z-index: 10000;
+  }
+
+  #logout-button-wrapper .button-logout {
+    font-size: 1.6rem;
+    padding: 0.6rem;
+    border-radius: 50%;
+    width: 3.2rem;
+    height: 3.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Si tu veux aussi un style circulaire pour le bouton dashboard */
+  #dashboard-button {
+    font-size: 1.6rem;
+    padding: 0.6rem;
+    border-radius: 50%;
+    width: 3.2rem;
+    height: 3.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
 @media (max-width: 1024px) {
+  #welcome-message
+ {
+    padding: 0;
+    margin: 0 auto;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    border-radius: 12px;
+    text-align: center;
+}
+  .main-panel
+ {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 24px;
+    padding: 0px;
+    max-width: 1220px;
+    width: 95%;
+    margin: 2rem auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
   #radio-layout,
   #video-layout {
     display: flex;
@@ -145,5 +244,62 @@ body {
     opacity: 0.75;
     padding: 0.5rem;
   }
+      #audio-description, #radio-right {
+        max-width: 100%;
+        width: -webkit-fill-available;
+        text-align: center;
+    }
+
+
+   /* Force l'affichage en ligne uniquement en sticky */
+  .tabs.sticky {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Boutons compacts */
+  .tabs.sticky .tab-button {
+    padding: 0.6em !important;
+    font-size: 1.6rem !important; /* taille icône */
+    width: 3.2rem !important;
+    height: 3.2rem !important;
+    min-width: 3.2rem !important;
+    min-height: 3.2rem !important;
+  }
+
+  /* Cache le texte mais garde l'icône emoji */
+  .tabs.sticky .tab-button {
+    white-space: nowrap;
+  }
+  .tabs.sticky .tab-button span,
+  .tabs.sticky .tab-button small {
+    display: none !important;
+  }
+
+.tabs.sticky .tab-button {
+    font-size: 1.6rem !important; /* icône plus grosse */
+    width: 3.2rem !important;
+    height: 3.2rem !important;
+    min-width: 3.2rem !important;
+    min-height: 3.2rem !important;
+    text-indent: -9999px; /* masque le texte */
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Rétablit l’emoji au centre */
+  .tabs.sticky .tab-button::before {
+    content: attr(data-icon);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-indent: 0;
+  }
+  
+
 }
 

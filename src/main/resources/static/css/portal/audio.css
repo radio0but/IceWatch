@@ -57,7 +57,6 @@ audio {
 @media (max-width: 1024px) {
   #player-container, #metadata {
     margin: 0.7rem auto 0.5rem auto;
-    max-width: 300px;
     text-align: center;
   }
 

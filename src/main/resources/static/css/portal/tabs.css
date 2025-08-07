@@ -53,5 +53,7 @@
     cursor: pointer;
     transition: all 0.2s ease-in-out;
     width: fit-content !important;
+    position: relative;
+    right: -7px;
 }
 }
