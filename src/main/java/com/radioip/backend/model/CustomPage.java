@@ -21,8 +21,17 @@ public class CustomPage {
 
     private boolean enabled = true; // Page visible ou non
 
-    // === Getters & Setters ===
 
+    @Column(nullable = true)
+    private String icon; // Emoji ou code d'icône choisi pour le bouton
+
+    // === Getters & Setters ===
+    public String getIcon() { 
+        return icon; 
+    }
+    public void setIcon(String icon) { 
+        this.icon = icon;
+     }
     public Long getId() {
         return id;
     }

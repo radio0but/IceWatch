@@ -9,7 +9,7 @@
   <style th:utext="${custom.css}"></style>
 </th:block>
 </head>
-<body style="height: 100%;">
+<body class="dashboard" style="height: 100%;">
 
 
   <!-- === Topbar (fixe) === -->
@@ -188,6 +188,216 @@
   <form id="custom-page-form">
     <input type="hidden" id="page-id" />
     <label>Titre : <input type="text" id="page-title" required /></label><br>
+<label>Icône :
+  <select id="page-icon">
+    <option value="">(Aucune)</option>
+
+    <!-- 🏠 Navigation / Accueil -->
+    <option value="🏠">🏠 Accueil</option>
+    <option value="🏡">🏡 Maison</option>
+    <option value="🏢">🏢 Bâtiment</option>
+    <option value="🏰">🏰 Château</option>
+    <option value="⛪">⛪ Église</option>
+    <option value="🗼">🗼 Tour</option>
+    <option value="🌆">🌆 Ville</option>
+    <option value="🌇">🌇 Coucher de soleil urbain</option>
+    <option value="🏙️">🏙️ Skyline</option>
+    <option value="🗺️">🗺️ Carte</option>
+    <option value="📍">📍 Lieu</option>
+    <option value="📌">📌 Épinglé</option>
+    <option value="🧭">🧭 Boussole</option>
+    <option value="🏖️">🏖️ Plage</option>
+    <option value="🏜️">🏜️ Désert</option>
+    <option value="🏕️">🏕️ Camping</option>
+    <option value="🏔️">🏔️ Montagne</option>
+    <option value="🏝️">🏝️ Île</option>
+    <option value="🏟️">🏟️ Stade</option>
+    <option value="🏛️">🏛️ Monument</option>
+    <option value="🏗️">🏗️ Construction</option>
+    <option value="🛤️">🛤️ Voie ferrée</option>
+    <option value="🛣️">🛣️ Autoroute</option>
+
+    <!-- 🎵 Musique / Audio -->
+    <option value="🎧">🎧 Casque</option>
+    <option value="🎵">🎵 Musique</option>
+    <option value="🎶">🎶 Notes</option>
+    <option value="🎤">🎤 Micro</option>
+    <option value="🎙️">🎙️ Micro studio</option>
+    <option value="🎚️">🎚️ Faders</option>
+    <option value="🎛️">🎛️ Boutons audio</option>
+    <option value="🎹">🎹 Piano</option>
+    <option value="🥁">🥁 Batterie</option>
+    <option value="🎷">🎷 Saxophone</option>
+    <option value="🎺">🎺 Trompette</option>
+    <option value="🎻">🎻 Violon</option>
+    <option value="📻">📻 Radio ancienne</option>
+    <option value="🎼">🎼 Partition</option>
+    <option value="🪕">🪕 Banjo</option>
+    <option value="🪘">🪘 Tambour</option>
+    <option value="🪇">🪇 Maracas</option>
+    <option value="🪈">🪈 Flûte</option>
+
+    <!-- 🎬 Vidéo / Image -->
+    <option value="🎥">🎥 Caméra</option>
+    <option value="🎦">🎦 Cinéma</option>
+    <option value="🎬">🎬 Clap</option>
+    <option value="📺">📺 TV</option>
+    <option value="📹">📹 Caméscope</option>
+    <option value="📸">📸 Photo</option>
+    <option value="📷">📷 Appareil photo</option>
+    <option value="🖼️">🖼️ Image</option>
+    <option value="🖥️">🖥️ Ordinateur</option>
+    <option value="💻">💻 Portable</option>
+    <option value="📱">📱 Mobile</option>
+    <option value="🖲️">🖲️ Trackball</option>
+    <option value="🕹️">🕹️ Manette rétro</option>
+    <option value="🖌️">🖌️ Pinceau</option>
+    <option value="🎨">🎨 Palette</option>
+
+    <!-- 📚 Éducation / Lecture -->
+    <option value="🗞️">🗞️ Journal</option>
+    <option value="📰">📰 Article</option>
+    <option value="📖">📖 Livre</option>
+    <option value="📚">📚 Livres</option>
+    <option value="📓">📓 Carnet</option>
+    <option value="📒">📒 Agenda</option>
+    <option value="📔">📔 Journal</option>
+    <option value="📝">📝 Note</option>
+    <option value="✏️">✏️ Crayon</option>
+    <option value="🖋️">🖋️ Stylo</option>
+    <option value="✒️">✒️ Plume</option>
+    <option value="🖊️">🖊️ Stylo bille</option>
+    <option value="🎓">🎓 Études</option>
+    <option value="📊">📊 Graphique</option>
+    <option value="📈">📈 Croissance</option>
+    <option value="📉">📉 Baisse</option>
+    <option value="📎">📎 Trombone</option>
+    <option value="🧾">🧾 Facture</option>
+
+    <!-- 👥 Social / Communauté -->
+    <option value="👤">👤 Utilisateur</option>
+    <option value="👥">👥 Groupe</option>
+    <option value="💬">💬 Chat</option>
+    <option value="💭">💭 Bulle</option>
+    <option value="📢">📢 Annonce</option>
+    <option value="📣">📣 Haut-parleur</option>
+    <option value="🤝">🤝 Collaboration</option>
+    <option value="🙏">🙏 Merci</option>
+    <option value="🎯">🎯 Objectif</option>
+    <option value="🏆">🏆 Trophée</option>
+    <option value="🥇">🥇 Médaille or</option>
+    <option value="🥈">🥈 Médaille argent</option>
+    <option value="🥉">🥉 Médaille bronze</option>
+    <option value="🫂">🫂 Étreinte</option>
+    <option value="🤗">🤗 Accueil</option>
+
+    <!-- ⚙️ Outils / Tech -->
+    <option value="⚙️">⚙️ Paramètres</option>
+    <option value="🛠️">🛠️ Outils</option>
+    <option value="🔧">🔧 Clé</option>
+    <option value="🔨">🔨 Marteau</option>
+    <option value="🪛">🪛 Tournevis</option>
+    <option value="🗜️">🗜️ Étau</option>
+    <option value="🔒">🔒 Fermé</option>
+    <option value="🔓">🔓 Ouvert</option>
+    <option value="🔑">🔑 Clé</option>
+    <option value="🖱️">🖱️ Souris</option>
+    <option value="💾">💾 Disquette</option>
+    <option value="📡">📡 Antenne</option>
+    <option value="📶">📶 Signal</option>
+    <option value="🔋">🔋 Batterie</option>
+    <option value="🔌">🔌 Prise</option>
+    <option value="🖨️">🖨️ Imprimante</option>
+    <option value="🕰️">🕰️ Horloge</option>
+
+    <!-- 🌍 Nature / Événements -->
+    <option value="☀️">☀️ Soleil</option>
+    <option value="🌙">🌙 Lune</option>
+    <option value="⭐">⭐ Étoile</option>
+    <option value="🌟">🌟 Étoile brillante</option>
+    <option value="🔥">🔥 Feu</option>
+    <option value="💧">💧 Eau</option>
+    <option value="🌊">🌊 Vague</option>
+    <option value="🌳">🌳 Arbre</option>
+    <option value="🌸">🌸 Fleur</option>
+    <option value="🍀">🍀 Trèfle</option>
+    <option value="🌈">🌈 Arc-en-ciel</option>
+    <option value="❄️">❄️ Neige</option>
+    <option value="🌪️">🌪️ Tornade</option>
+    <option value="🌋">🌋 Volcan</option>
+    <option value="🎃">🎃 Halloween</option>
+    <option value="🎄">🎄 Noël</option>
+    <option value="🎆">🎆 Feux d’artifice</option>
+    <option value="🎉">🎉 Fête</option>
+    <option value="🎁">🎁 Cadeau</option>
+    <option value="🎂">🎂 Gâteau</option>
+
+    <!-- 🍔 Aliments -->
+    <option value="🍎">🍎 Pomme</option>
+    <option value="🍌">🍌 Banane</option>
+    <option value="🍇">🍇 Raisin</option>
+    <option value="🍓">🍓 Fraise</option>
+    <option value="🍒">🍒 Cerise</option>
+    <option value="🍍">🍍 Ananas</option>
+    <option value="🍕">🍕 Pizza</option>
+    <option value="🍔">🍔 Burger</option>
+    <option value="🌭">🌭 Hot-dog</option>
+    <option value="🥪">🥪 Sandwich</option>
+    <option value="🥗">🥗 Salade</option>
+    <option value="🍣">🍣 Sushi</option>
+    <option value="🍰">🍰 Gâteau part</option>
+    <option value="🍫">🍫 Chocolat</option>
+    <option value="🍩">🍩 Donut</option>
+    <option value="🍿">🍿 Popcorn</option>
+    <option value="🍷">🍷 Vin</option>
+    <option value="🍺">🍺 Bière</option>
+
+    <!-- 🚗 Transport -->
+    <option value="🚗">🚗 Voiture</option>
+    <option value="🚙">🚙 SUV</option>
+    <option value="🏍️">🏍️ Moto</option>
+    <option value="🚲">🚲 Vélo</option>
+    <option value="🛵">🛵 Scooter</option>
+    <option value="🚌">🚌 Bus</option>
+    <option value="🚆">🚆 Train</option>
+    <option value="🚄">🚄 TGV</option>
+    <option value="🚇">🚇 Métro</option>
+    <option value="🚀">🚀 Fusée</option>
+    <option value="✈️">✈️ Avion</option>
+    <option value="🛫">🛫 Décollage</option>
+    <option value="🛬">🛬 Atterrissage</option>
+    <option value="🚢">🚢 Bateau</option>
+    <option value="⛴️">⛴️ Ferry</option>
+    <option value="🛳️">🛳️ Croisière</option>
+    <option value="⚓">⚓ Ancre</option>
+    <option value="🚁">🚁 Hélicoptère</option>
+
+    <!-- 🏅 Sports / Loisirs -->
+    <option value="⚽">⚽ Football</option>
+    <option value="🏀">🏀 Basket</option>
+    <option value="🏈">🏈 Football US</option>
+    <option value="⚾">⚾ Baseball</option>
+    <option value="🎾">🎾 Tennis</option>
+    <option value="🏐">🏐 Volley</option>
+    <option value="🏉">🏉 Rugby</option>
+    <option value="🥊">🥊 Boxe</option>
+    <option value="🥋">🥋 Arts martiaux</option>
+    <option value="⛳">⛳ Golf</option>
+    <option value="🏓">🏓 Ping-pong</option>
+    <option value="🎯">🎯 Fléchettes</option>
+    <option value="🎳">🎳 Bowling</option>
+    <option value="🥌">🥌 Curling</option>
+    <option value="⛸️">⛸️ Patin</option>
+    <option value="🏂">🏂 Snowboard</option>
+    <option value="⛷️">⛷️ Ski</option>
+    <option value="🏄">🏄 Surf</option>
+    <option value="🚣">🚣 Aviron</option>
+    <option value="🏇">🏇 Équitation</option>
+  </select>
+</label>
+
+
+<br>
     <label>Slug : <input type="text" id="page-slug" placeholder="ex: a-propos" required /></label><br>
     <label>Contenu HTML :</label><br>
     <textarea id="page-html" rows="8" style="width: 100%;"></textarea><br>

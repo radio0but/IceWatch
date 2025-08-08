@@ -114,9 +114,15 @@ function parseProperties(blob) {
   return props;
 }
 
+
 // === Génère un `.look` à partir d’un objet
 function generateBlob(props) {
   return Object.entries(props)
-    .map(([key, value]) => `${key}=${value}`)
+    .map(([key, value]) => {
+      // Supprime tous les retours à la ligne et réduit les espaces multiples
+      const singleLineValue = value.replace(/\r?\n/g, '').replace(/\s{2,}/g, ' ');
+      return `${key}=${singleLineValue}`;
+    })
     .join('\n');
 }
+

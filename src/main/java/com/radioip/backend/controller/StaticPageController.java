@@ -71,23 +71,32 @@ private void sendHtmlWithSubstitutions(String path, HttpServletResponse response
     StringBuilder pageButtons = new StringBuilder();
     StringBuilder pageTabs = new StringBuilder();
 
+// 🔘 Boutons et contenus des pages personnalisées
     for (CustomPage page : repository.findAll()) {
         if (!page.isEnabled()) continue;
 
         String slug = page.getSlug();
         String title = page.getTitle();
+        String icon = (page.getIcon() != null && !page.getIcon().isEmpty()) ? page.getIcon() : "";
 
-        // 🔘 Bouton dans la barre d'onglets
-    pageButtons.append("""
-        <button class="tab-button" data-tab="%1$s">%2$s</button>
-        """.formatted(slug, title));   
-    pageTabs.append("""
-        <div id="tab-%1$s" class="tab-content">
-        %2$s
-        </div>
-        """.formatted(slug, page.getHtmlContent() != null ? page.getHtmlContent() : ""));
+        // Bouton de l'onglet
+        pageButtons.append("""
+            <button class="tab-button" data-tab="%1$s" data-icon="%2$s">%2$s %3$s</button>
+        """.formatted(
+            slug,  // %1$s → utilisé pour data-tab
+            icon,  // %2$s → icône (sans espace en trop)
+            title  // %3$s → titre lisible
+        ));
 
-
+        // Contenu de la page
+        pageTabs.append("""
+            <div id="tab-%1$s" class="tab-content">
+            %2$s
+            </div>
+        """.formatted(
+            slug,
+            page.getHtmlContent() != null ? page.getHtmlContent() : ""
+        ));
     }
 
 

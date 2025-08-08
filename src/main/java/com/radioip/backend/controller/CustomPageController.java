@@ -36,6 +36,7 @@ public class CustomPageController {
                 .map(existing -> {
                     existing.setTitle(page.getTitle());
                     existing.setSlug(page.getSlug());
+                    existing.setIcon(page.getIcon());
                     existing.setHtmlContent(page.getHtmlContent());
                     existing.setEnabled(page.isEnabled());
                     return ResponseEntity.ok(repository.save(existing));

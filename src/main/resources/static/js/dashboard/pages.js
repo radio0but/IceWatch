@@ -65,12 +65,14 @@ async function savePage() {
   const editor = tinymce.get("page-html");
   if (editor) editor.save(); // 🔁 Met à jour le <textarea> à partir du contenu TinyMCE
 
-  const payload = {
-    title: document.getElementById("page-title").value.trim(),
-    slug: document.getElementById("page-slug").value.trim(),
-    htmlContent: document.getElementById("page-html").value.trim(),
-    enabled: document.getElementById("page-enabled").checked,
-  };
+const payload = {
+  title: document.getElementById("page-title").value.trim(),
+  slug: document.getElementById("page-slug").value.trim(),
+  htmlContent: document.getElementById("page-html").value.trim(),
+  enabled: document.getElementById("page-enabled").checked,
+  icon: document.getElementById("page-icon").value.trim()
+};
+
 
   const method = editingId ? "PUT" : "POST";
   const url = editingId ? `/admin/pages/${editingId}` : `/admin/pages`;
@@ -101,6 +103,7 @@ window.editPage = function (id) {
   document.getElementById("page-title").value = page.title;
   document.getElementById("page-slug").value = page.slug;
   document.getElementById("page-enabled").checked = page.enabled;
+  document.getElementById("page-icon").value = page.icon || "";
 
   const textarea = document.getElementById("page-html");
 
@@ -145,7 +148,7 @@ window.resetPageForm = function () {
   editingId = null;
   document.getElementById("custom-page-form").reset();
   document.getElementById("page-id").value = "";
-
+  document.getElementById("page-icon").value = "";
   const existing = tinymce.get("page-html");
   if (existing) existing.remove();
 
