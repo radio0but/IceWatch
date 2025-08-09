@@ -1,3 +1,5 @@
+//pages.js
+
 import { setupTinyMCE } from "./tinymce.js";
 
 let pages = [];

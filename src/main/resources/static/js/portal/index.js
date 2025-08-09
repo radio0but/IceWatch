@@ -1,13 +1,14 @@
 import { fetchApiBase, fetchToken, setupVideo } from "./player.js";
 import { updateMetadata, startAutoScrollAfterDelay } from "./metadata.js";
-import { initJournalRSS } from "./rss.js";
 import { setupTabs } from "./tabs.js";
 import { loadEmissionDescriptions } from "./emission.js";
 import { initParallaxAndStickyHeader } from "./parallaxHeader.js"
+import { initJournalTab } from "./journal.js";
+
 window.addEventListener("DOMContentLoaded", async () => {
   try {
     await fetchApiBase();
-
+    initJournalTab();
     // === AUDIO ===
     const { initCustomAudioPlayer } = await import("./radioPlayer.js");
     await initCustomAudioPlayer();
@@ -23,7 +24,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     // === Autres modules ===
     updateMetadata();
     startAutoScrollAfterDelay();
-    await initJournalRSS();
     await loadEmissionDescriptions();
   } catch (err) {
     console.error("Erreur d'initialisation :", err);

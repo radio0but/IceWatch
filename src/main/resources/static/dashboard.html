@@ -82,27 +82,82 @@
 
   </div>
 </div>
+<div id="tab-rss" class="tab-content">
+  <h2>🗞️ Journal étudiant</h2>
 
-      <div id="tab-rss" class="tab-content">
-  <h2>🗞️ Journal étudiant (via flux RSS)</h2>
-
-  <p>Ce module permet d’afficher automatiquement les derniers articles d’un journal étudiant externe (ex: WordPress) dans la page d’accueil.</p>
-
-  <label for="rss-url">🔗 URL du flux RSS :</label>
-  <input type="text" id="rss-url" placeholder="https://exemple.com/feed" />
-
-  <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-    <button onclick="testRSS()">🔍 Tester le lien</button>
-    <button onclick="saveRSS()">💾 Enregistrer</button>
-    <div style="margin-top: 1rem;">
-      <label>
+  <!-- Bloc RSS externe -->
+  <section id="rss-settings" style="margin-bottom: 2rem;">
+    <h3>🔗 Flux RSS externe</h3>
+    <label for="rss-url">URL du flux :</label>
+    <input type="text" id="rss-url" placeholder="https://exemple.com/feed" />
+    <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+      <button onclick="testRSS()">🔍 Tester le lien</button>
+      <button onclick="saveRSS()">💾 Enregistrer</button>
+      <label style="display: flex; align-items: center; gap: 0.5rem;">
         <input type="checkbox" id="rss-show-images" />
-        🖼️ Afficher les images des articles RSS
+        🖼️ Afficher les images
       </label>
+      <span id="rss-status" style="align-self: center;"></span>
     </div>
-    <span id="rss-status" style="align-self: center;"></span>
+  </section>
+
+  <!-- Bloc Articles internes -->
+  <section id="articles-section">
+    <h3>📝 Articles internes</h3>
+    <button id="new-article-btn">➕ Nouvel article</button>
+    <table id="articles-table" style="width: 100%; margin-top: 1rem;">
+      <thead>
+        <tr>
+          <th>Titre</th>
+          <th>Slug</th>
+          <th>Publié</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+<!-- Bloc Articles internes -->
+<section id="articles-section">
+  <h3>📝 Articles internes</h3>
+  <button id="new-article-btn">➕ Nouvel article</button>
+
+  <table id="articles-table" style="width: 100%; margin-top: 1rem;">
+    <thead>
+      <tr>
+        <th>Titre</th>
+        <th>Slug</th>
+        <th>Publié</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- Éditeur toujours visible -->
+  <div id="article-editor" style="margin-top:2rem;">
+    <h4>✏️ Édition d'article</h4>
+    <form>
+      <label>
+        Titre : <input type="text" id="article-title" required>
+      </label><br>
+      <label>
+        Slug : <input type="text" id="article-slug" required>
+      </label><br>
+      <label>
+        <input type="checkbox" id="article-published" checked> Publié
+      </label><br>
+      <label>Contenu :</label>
+      <textarea id="article-content" rows="10"></textarea>
+      <div style="margin-top:1rem;">
+        <button type="submit">💾 Enregistrer</button>
+      </div>
+    </form>
   </div>
+</section>
+
 </div>
+
 
       <div id="tab-users" class="tab-content">
   <h2>Gestion des utilisateurs</h2>

@@ -17,8 +17,49 @@ import { loadSchedule } from "./schedule.js";
 import { loadRSSConfig } from "./rss.js";
 import { fetchUsers } from "./users.js";
 import { initCustomPages } from "./pages.js";
-
 import { initAppearanceEditor } from "./appearanceEditor.js";
+import { initArticlesSection } from "./articles.js"; // ton code existant
+
+
+export function initJournalDashboard() {
+  const modeRadios = document.querySelectorAll("input[name='journal-mode']");
+  const rssBlock = document.getElementById("rss-settings");
+  const articlesBlock = document.getElementById("articles-section");
+
+  // Charger le mode actuel depuis le backend
+  fetch("/admin/settings/journal-mode")
+    .then(res => res.json())
+    .then(({ mode }) => {
+      document.querySelector(`input[name='journal-mode'][value='${mode}']`).checked = true;
+      toggleJournalMode(mode);
+    })
+    .catch(() => toggleJournalMode("rss"));
+
+  // Changement de mode
+  modeRadios.forEach(r => {
+    r.addEventListener("change", async () => {
+      const newMode = r.value;
+      toggleJournalMode(newMode);
+      await fetch("/admin/settings/journal-mode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: newMode })
+      });
+    });
+  });
+
+  function toggleJournalMode(mode) {
+    if (mode === "rss") {
+      rssBlock.style.display = "block";
+      articlesBlock.style.display = "none";
+      loadRSSConfig(); // ✅ on charge les réglages RSS
+    } else {
+      rssBlock.style.display = "none";
+      articlesBlock.style.display = "block";
+      initArticlesSection(); // ✅ on initialise les articles internes
+    }
+  }
+}
 
 function setupSidebarNav() {
   const buttons = document.querySelectorAll(".sidebar-nav button");
@@ -85,10 +126,9 @@ window.addEventListener("DOMContentLoaded", async () => {
   updateSchedulerStatus();
   setupAppearanceNotesAutoSave();
   initCustomPages();
-
   await loadProperties();           // ✅ On attend que le contenu soit chargé
   initAppearanceEditor();          // ✅ Maintenant on peut initialiser les champs
-
+  initArticlesSection();
   // Actions boutons
   const withFeedback = async (btnId, spanId, action) => {
     const statusEl = document.getElementById(spanId);

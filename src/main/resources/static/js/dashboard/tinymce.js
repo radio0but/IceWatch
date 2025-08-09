@@ -74,3 +74,9 @@ export function setupDualEditor() {
   setupTinyMCE('#audio-info');
   setupTinyMCE('#video-info');
 }
+export function destroyTinyMCE(selector) {
+    const inst = tinymce.get(selector.replace("#", ""));
+    if (inst) {
+        inst.remove();
+    }
+}
